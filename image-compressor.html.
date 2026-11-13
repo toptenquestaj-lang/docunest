@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101827">
+<title>Image Compressor | DocuNest</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb;color:#172033}
+header{background:#101827;color:white;padding:18px 6%;font-size:23px;font-weight:bold}
+header span{color:#64a5ff}
+main{max-width:650px;margin:35px auto;padding:0 17px}
+h1{font-size:30px}
+p{color:#64748b;line-height:1.6}
+.panel{background:white;border:1px solid #e4e9f1;padding:22px;border-radius:16px;margin-top:20px}
+.upload{border:2px dashed #9bb8e5;padding:30px 12px;text-align:center;border-radius:12px;background:#f7faff}
+.upload input{max-width:100%;margin-top:15px}
+label{display:block;font-weight:bold;margin:20px 0 9px}
+select,input[type=range]{width:100%}
+select{padding:12px;border:1px solid #d4dce8;border-radius:9px;background:white}
+button,.download{display:block;width:100%;border:0;border-radius:10px;padding:14px;margin-top:18px;background:#2468d5;color:white;font-weight:bold;font-size:15px;text-align:center;text-decoration:none}
+button:disabled{opacity:.5}
+.preview{width:100%;max-height:280px;object-fit:contain;margin-top:15px;border-radius:10px;display:none}
+.result{display:none;margin-top:20px;padding:16px;background:#edf5ff;border-radius:12px}
+.stats{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.small{font-size:13px;color:#64748b}
+footer{text-align:center;padding:25px;color:#64748b;font-size:13px}
+</style>
+</head>
+<body>
+<header>Docu<span>Nest</span></header>
+<main>
+<a href="index.html" style="color:#2468d5;text-decoration:none">← Back to DocuNest</a>
+<h1>Image Compressor</h1>
+<p>Reduce image file size directly on your device. No account or upload required.</p>
+
+<div class="panel">
+<div class="upload">
+<div style="font-size:42px">🖼️</div>
+<strong>Select an image</strong>
+<p class="small">Choose a JPG, PNG or WebP image from your phone.</p>
+<input type="file" id="file" accept="image/jpeg,image/png,image/webp">
+</div>
+
+<img id="preview" class="preview" alt="Selected image preview">
+
+<label for="quality">Compression quality: <span id="qualityValue">70%</span></label>
+<input type="range" id="quality" min="10" max="100" value="70">
+
+<label for="format">Output format</label>
+<select id="format">
+<option value="image/jpeg">JPG</option>
+<option value="image/webp">WebP</option>
+</select>
+
+<button id="compress" disabled>Compress Image</button>
+
+<div class="result" id="result">
+<h3>Compression complete!</h3>
+<div class="stats">
+<div><div class="small">Original size</div><strong id="originalSize"></strong></div>
+<div><div class="small">New size</div><strong id="newSize"></strong></div>
+<div><div class="small">Size reduced</div><strong id="saved"></strong></div>
+</div>
+<a id="download" class="download" download="docunest-compressed.jpg">Download compressed image</a>
+<p class="small" id="note"></p>
+</div>
+</div>
+</main>
+<footer>DocuNest · Your digital toolbox</footer>
+
+<script>
+const fileInput=document.getElementById("file");
+const quality=document.getElementById("quality");
+const qualityValue=document.getElementById("qualityValue");
+const format=document.getElementById("format");
+const preview=document.getElementById("preview");
+const compress=document.getElementById("compress");
+const result=document.getElementById("result");
+let selectedFile=null;
+let image=new Image();
+let originalUrl=null;
+let outputUrl=null;
+
+function sizeText(bytes){
+ if(bytes<1024)return bytes+" B";
+ if(bytes<1048576)return (bytes/1024).toFixed(1)+" KB";
+ return (bytes/1048576).toFixed(2)+" MB";
+}
+
+fileInput.addEventListener("change",()=>{
+ selectedFile=fileInput.files[0];
+ result.style.display="none";
+ if(originalUrl)URL.revokeObjectURL(originalUrl);
+ if(outputUrl)URL.revokeObjectURL(outputUrl);
+ outputUrl=null;
+ if(!selectedFile)return;
+ if(!selectedFile.type.startsWith("image/")){
+  alert("Please select a valid image.");
+  selectedFile=null;
+  compress.disabled=true;
+  return;
+ }
+ originalUrl=URL.createObjectURL(selectedFile);
+ image.onload=()=>{
+  preview.src=originalUrl;
+  preview.style.display="block";
+  compress.disabled=false;
+ };
+ image.onerror=()=>{
+  alert("This image could not be opened. Please try another image.");
+  compress.disabled=true;
+ };
+ image.src=originalUrl;
+});
+
+quality.addEventListener("input",()=>{
+ qualityValue.textContent=quality.value+"%";
+});
+
+compress.addEventListener("click",()=>{
+ if(!selectedFile||!image.naturalWidth)return;
+ compress.disabled=true;
+ compress.textContent="Compressing...";
+
+ const canvas=document.createElement("canvas");
+ canvas.width=image.naturalWidth;
+ canvas.height=image.naturalHeight;
+ const context=canvas.getContext("2d");
+ const outputType=format.value;
+
+ if(outputType==="image/jpeg"){
+  context.fillStyle="#ffffff";
+  context.fillRect(0,0,canvas.width,canvas.height);
+ }
+ context.drawImage(image,0,0);
+
+ canvas.toBlob(blob=>{
+  compress.disabled=false;
+  compress.textContent="Compress Image";
+
+  if(!blob){
+   alert("Compression failed. Please try another image.");
+   return;
+  }
+
+  if(outputUrl)URL.revokeObjectURL(outputUrl);
+  outputUrl=URL.createObjectURL(blob);
+
+  document.getElementById("originalSize").textContent=sizeText(selectedFile.size);
+  document.getElementById("newSize").textContent=sizeText(blob.size);
+
+  const reduction=(1-blob.size/selectedFile.size)*100;
+  document.getElementById("saved").textContent=
+   reduction>0?reduction.toFixed(1)+"%":reduction.toFixed(1)+"% (larger)";
+
+  const link=document.getElementById("download");
+  const ext=outputType==="image/jpeg"?"jpg":"webp";
+  link.href=outputUrl;
+  link.download="docunest-compressed."+ext;
+
+  document.getElementById("note").textContent=
+   reduction>0?"Your image is now smaller.":"This output is not smaller than the original. Try another quality or format.";
+
+  result.style.display="block";
+ },outputType,Number(quality.value)/100);
+});
+</script>
+</body>
+</html>
