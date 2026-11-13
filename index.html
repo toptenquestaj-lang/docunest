@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<meta name="description" content="DocuNest - Your all-in-one digital toolbox for documents, images, AI and everyday utilities.">
+<title>DocuNest - Your Digital Toolbox</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f6f8fc;color:#172033}
+header{background:#101827;color:white;padding:18px 6%;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:25px;font-weight:800;letter-spacing:-1px}
+.logo span{color:#64a5ff}
+nav a{color:#dce5f5;text-decoration:none;margin-left:20px;font-size:14px}
+.hero{text-align:center;padding:65px 18px 55px;background:linear-gradient(135deg,#101827,#203d68);color:white}
+.hero h1{font-size:clamp(32px,7vw,52px);margin-bottom:14px}
+.hero p{color:#cbd8ec;line-height:1.6;max-width:550px;margin:auto}
+.search{max-width:580px;margin:28px auto 0;display:flex;background:white;border-radius:12px;padding:6px}
+.search input{flex:1;min-width:0;border:0;outline:0;padding:13px;font-size:15px}
+.search button{background:#3478e5;color:white;border:0;border-radius:8px;padding:0 18px;font-weight:bold}
+main{max-width:1100px;margin:auto;padding:35px 18px}
+.section-title{font-size:25px;margin-bottom:8px}
+.sub{color:#6c778b;font-size:14px;margin-bottom:22px}
+.filters{display:flex;gap:9px;overflow-x:auto;padding:5px 0 18px}
+.filter{border:1px solid #dce2ed;background:white;color:#43506a;padding:9px 15px;border-radius:25px;white-space:nowrap}
+.filter.active{background:#2468d5;color:white;border-color:#2468d5}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.tool{background:white;border:1px solid #e7ebf2;border-radius:15px;padding:19px;text-decoration:none;color:inherit;transition:.2s;min-height:145px}
+.tool:active{transform:scale(.98)}
+.tool .ico{font-size:27px;margin-bottom:13px}
+.tool h3{font-size:16px;margin-bottom:7px}
+.tool p{font-size:13px;color:#758096;line-height:1.5}
+.tag{display:inline-block;font-size:10px;color:#2870cf;background:#edf4ff;padding:5px 8px;border-radius:20px;margin-top:12px}
+.empty{text-align:center;padding:35px;color:#718096;display:none}
+.ai{margin-top:38px;padding:28px;border-radius:18px;background:#eaf2ff}
+.ai h2{margin-bottom:9px}
+.ai p{color:#52627b;line-height:1.6;font-size:14px}
+footer{text-align:center;padding:28px 15px;background:#101827;color:#cbd5e1;font-size:13px;margin-top:40px}
+footer p{margin:7px}
+@media(min-width:650px){
+.grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.hero{padding:85px 20px 75px}
+}
+@media(min-width:950px){
+.grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Docu<span>Nest</span></div>
+  <nav>
+    <a href="#tools">Tools</a>
+    <a href="#ai">AI Tools</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <h1>Your entire digital toolbox.</h1>
+  <p>Documents, images, files, AI and everyday utilities. Find the right tool and get things done in one place.</p>
+  <div class="search">
+    <input id="search" type="search" placeholder="Search for a tool...">
+    <button onclick="searchTools()">Search</button>
+  </div>
+</section>
+
+<main id="tools">
+  <h2 class="section-title">Explore our tools</h2>
+  <p class="sub">Useful digital tools, all in one place.</p>
+
+  <div class="filters">
+    <button class="filter active" data-category="all">All tools</button>
+    <button class="filter" data-category="documents">Documents</button>
+    <button class="filter" data-category="images">Images</button>
+    <button class="filter" data-category="media">Media</button>
+    <button class="filter" data-category="ai">AI</button>
+    <button class="filter" data-category="utilities">Utilities</button>
+  </div>
+
+  <div class="grid" id="grid">
+    <a class="tool" href="#" data-category="documents" data-name="PDF tools merge split compress">
+      <div class="ico">📄</div><h3>PDF Tools</h3>
+      <p>Merge, split, compress and manage PDF files.</p><span class="tag">Coming soon</span>
+    </a>
+    <a class="tool" href="#" data-category="documents" data-name="word documents converter editor">
+      <div class="ico">📝</div><h3>Word Tools</h3>
+      <p>Work with Word documents and text files.</p><span class="tag">Coming soon</span>
+    </a>
+    <a class="tool" href="#" data-category="documents" data-name="excel spreadsheet tools">
+      <div class="ico">📊</div><h3>Excel Tools</h3>
+      <p>Manage, convert and organize spreadsheets.</p><span class="tag">Coming soon</span>
+    </a>
+    <a class="tool" href="#" data-category="documents" data-name="powerpoint presentation tools">
+      <div class="ico">📽️</div><h3>PowerPoint Tools</h3>
+      <p>Tools for presentations and slides.</p><span class="tag">Coming soon</span>
+    </a>
+    <a class="tool" href="#" data-category="images" data-name="image compressor resize convert">
+      <div class="ico">🖼️</div><h3>Image Tools</h3>
+      <p>Resize, compress and convert images.</p><span class="tag">Coming soon</span>
+    </a>
+    <a class="tool" href="#" data-category="media" data-name="video audio converter">
+      <div class="ico">🎬</div><h3>Video & Audio</h3>
+      <p>Explore media conversion and editing tools.</p><span class="tag">Coming soon</span>
+    </a>
+    <a class="tool" href="#" data-category="ai" data-name="AI summarize rewrite translate">
+      <div class="ico">✨</div><h3>AI Workspace</h3>
+      <p>Summarize, rewrite and translate content.</p><span class="tag">Coming soon</span>
+    </a>
+    <a class="tool" href="#" data-category="utilities" data-name="developer JSON code formatter">
+      <div class="ico">💻</div><h3>Developer Tools</h3>
+      <p>Format JSON, encode text and work with code.</p><span class="tag">Coming soon</span>
+    </a>
+    <a class="tool" href="#" data-category="utilities" data-name="calculator unit converter">
+      <div class="ico">🧮</div><h3>Calculators</h3>
+      <p>Math, unit and everyday calculations.</p><span class="tag">Coming soon</span>
+    </a>
+    <a class="tool" href="#" data-category="utilities" data-name="QR code barcode generator">
+      <div class="ico">🔳</div><h3>QR Code Tools</h3>
+      <p>Create QR codes for links and information.</p><span class="tag">Coming soon</span>
+    </a>
+  </div>
+  <div class="empty" id="empty">No matching tools found. Try another search.</div>
+
+  <section class="ai" id="ai">
+    <h2>✨ Your AI Workspace</h2>
+    <p>Imagine summarizing long documents, extracting important information, translating text and rewriting content — all from one place. Our AI tools are coming soon.</p>
+  </section>
+</main>
+
+<footer>
+  <div class="logo">Docu<span>Nest</span></div>
+  <p>Your digital toolbox, all in one place.</p>
+  <p>© 2026 DocuNest. Built to make everyday tasks easier.</p>
+</footer>
+
+<script>
+const searchInput=document.getElementById("search");
+const cards=[...document.querySelectorAll(".tool")];
+const filters=[...document.querySelectorAll(".filter")];
+let category="all";
+
+function updateTools(){
+ const query=searchInput.value.toLowerCase().trim();
+ let count=0;
+ cards.forEach(card=>{
+  const matchesCategory=category==="all"||card.dataset.category===category;
+  const matchesSearch=card.dataset.name.toLowerCase().includes(query);
+  card.style.display=matchesCategory&&matchesSearch?"block":"none";
+  if(matchesCategory&&matchesSearch)count++;
+ });
+ document.getElementById("empty").style.display=count?"none":"block";
+}
+
+function searchTools(){updateTools();}
+searchInput.addEventListener("input",updateTools);
+
+filters.forEach(button=>{
+ button.addEventListener("click",()=>{
+  filters.forEach(item=>item.classList.remove("active"));
+  button.classList.add("active");
+  category=button.dataset.category;
+  updateTools();
+ });
+});
+</script>
+</body>
+</html>
