@@ -1,0 +1,189 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<title>Word to PDF Converter - DocuNest</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f4f7fb;color:#172033}
+header{background:#101827;color:white;padding:18px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:22px;font-weight:bold;color:white;text-decoration:none}
+.logo span{color:#60a5fa}
+.back{color:white;text-decoration:none;font-size:14px}
+main{max-width:850px;margin:35px auto;padding:15px}
+h1{font-size:30px;margin-bottom:10px}
+.intro{color:#68758b;line-height:1.6;margin-bottom:25px}
+.panel{background:white;border:1px solid #e3e9f2;border-radius:16px;padding:24px}
+.upload{display:block;border:2px dashed #9db7df;border-radius:12px;padding:25px 15px;text-align:center;background:#f7faff;cursor:pointer}
+.upload strong{display:block;margin-bottom:8px}
+.upload span{font-size:13px;color:#718096}
+input[type=file]{display:none}
+.details{margin-top:18px;padding:14px;background:#f1f5f9;border-radius:10px;font-size:14px;line-height:1.7}
+button{width:100%;padding:15px;margin-top:18px;border:0;border-radius:9px;background:#2563eb;color:white;font-size:16px;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+.status{margin-top:15px;font-size:14px;line-height:1.5}
+.preview-title{margin-top:25px;margin-bottom:10px;font-size:17px}
+#preview{background:white;border:1px solid #e1e6ef;border-radius:8px;padding:25px;min-height:100px;overflow-wrap:anywhere;line-height:1.6}
+#preview h1,#preview h2,#preview h3{margin:14px 0 8px}
+#preview p{margin:7px 0}
+#preview img{max-width:100%;height:auto}
+#preview table{border-collapse:collapse;max-width:100%;margin:12px 0}
+#preview td,#preview th{border:1px solid #aaa;padding:6px}
+#preview ul,#preview ol{padding-left:25px}
+.note{font-size:12px;color:#758096;line-height:1.6;margin-top:18px}
+footer{text-align:center;padding:25px;color:#7b8799;font-size:13px}
+</style>
+</head>
+
+<body>
+<header>
+<a class="logo" href="index.html">Docu<span>Nest</span></a>
+<a class="back" href="index.html">← Back to tools</a>
+</header>
+
+<main>
+<h1>Word to PDF Converter</h1>
+<p class="intro">
+Convert your Word documents into PDF files quickly and easily.
+</p>
+
+<section class="panel">
+<label class="upload" for="wordInput">
+<strong>📝 Select a Word document</strong>
+<span>Choose a .docx file from your device</span>
+</label>
+
+<input type="file" id="wordInput"
+accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+
+<div class="details" id="details">No document selected.</div>
+
+<button id="convertBtn" disabled>Convert to PDF</button>
+
+<div class="status" id="status">Select a Word document to begin.</div>
+
+<h2 class="preview-title">Document Preview</h2>
+<div id="preview">Your document preview will appear here.</div>
+
+<p class="note">
+Only .docx files are supported. Complex Word layouts, page breaks,
+fonts and some formatting may look different in the converted PDF.
+Processing takes place in your browser. An internet connection is
+required to load the conversion libraries.
+</p>
+</section>
+</main>
+
+<footer>© 2026 DocuNest · Your digital toolbox</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.9.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"></script>
+
+<script>
+const wordInput=document.getElementById("wordInput");
+const details=document.getElementById("details");
+const convertBtn=document.getElementById("convertBtn");
+const status=document.getElementById("status");
+const preview=document.getElementById("preview");
+
+let documentHTML="";
+let fileName="document";
+
+wordInput.addEventListener("change",async()=>{
+const file=wordInput.files[0];
+documentHTML="";
+convertBtn.disabled=true;
+
+if(!file){
+details.textContent="No document selected.";
+return;
+}
+
+if(!file.name.toLowerCase().endsWith(".docx")){
+details.textContent="Please select a .docx Word document.";
+status.textContent="Unsupported file format.";
+return;
+}
+
+fileName=file.name.replace(/\.docx$/i,"");
+details.innerHTML="<strong>File:</strong> "+file.name+
+"<br><strong>Size:</strong> "+(file.size/1024).toFixed(1)+" KB";
+
+status.textContent="Reading Word document...";
+preview.textContent="Loading preview...";
+
+try{
+const arrayBuffer=await file.arrayBuffer();
+
+const result=await mammoth.convertToHtml(
+{arrayBuffer:arrayBuffer},
+{
+convertImage:mammoth.images.imgElement(function(image){
+return image.read("base64").then(function(imageBuffer){
+return {
+src:"data:"+image.contentType+";base64,"+imageBuffer
+};
+});
+})
+}
+);
+
+documentHTML=result.value;
+
+if(!documentHTML.trim()){
+throw new Error("No document content found.");
+}
+
+preview.innerHTML=documentHTML;
+convertBtn.disabled=false;
+status.textContent="Document ready. Check the preview and convert.";
+
+}catch(error){
+console.error(error);
+preview.textContent="Could not read this document.";
+status.textContent="Conversion failed. Please try another DOCX file.";
+}
+});
+
+convertBtn.addEventListener("click",async()=>{
+if(!documentHTML)return;
+
+convertBtn.disabled=true;
+status.textContent="Creating your PDF...";
+
+try{
+const options={
+margin:12,
+filename:fileName+".pdf",
+image:{type:"jpeg",quality:0.95},
+html2canvas:{
+scale:2,
+useCORS:true,
+backgroundColor:"#ffffff"
+},
+jsPDF:{
+unit:"mm",
+format:"a4",
+orientation:"portrait"
+},
+pagebreak:{mode:["css","legacy"]}
+};
+
+await html2pdf().set(options).from(preview).save();
+
+status.textContent="Success! Your PDF has been downloaded.";
+
+}catch(error){
+console.error(error);
+status.textContent="Could not create PDF. Please try again.";
+}finally{
+convertBtn.disabled=false;
+}
+});
+</script>
+</body>
+</html>
