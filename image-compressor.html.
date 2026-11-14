@@ -3,169 +3,264 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#101827">
-<title>Image Compressor | DocuNest</title>
+<title>Image Compressor - DocuNest</title>
+
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb;color:#172033}
-header{background:#101827;color:white;padding:18px 6%;font-size:23px;font-weight:bold}
-header span{color:#64a5ff}
-main{max-width:650px;margin:35px auto;padding:0 17px}
-h1{font-size:30px}
-p{color:#64748b;line-height:1.6}
-.panel{background:white;border:1px solid #e4e9f1;padding:22px;border-radius:16px;margin-top:20px}
-.upload{border:2px dashed #9bb8e5;padding:30px 12px;text-align:center;border-radius:12px;background:#f7faff}
-.upload input{max-width:100%;margin-top:15px}
-label{display:block;font-weight:bold;margin:20px 0 9px}
-select,input[type=range]{width:100%}
-select{padding:12px;border:1px solid #d4dce8;border-radius:9px;background:white}
-button,.download{display:block;width:100%;border:0;border-radius:10px;padding:14px;margin-top:18px;background:#2468d5;color:white;font-weight:bold;font-size:15px;text-align:center;text-decoration:none}
-button:disabled{opacity:.5}
-.preview{width:100%;max-height:280px;object-fit:contain;margin-top:15px;border-radius:10px;display:none}
-.result{display:none;margin-top:20px;padding:16px;background:#edf5ff;border-radius:12px}
-.stats{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.small{font-size:13px;color:#64748b}
-footer{text-align:center;padding:25px;color:#64748b;font-size:13px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f4f7fc;color:#172033}
+header{background:#101827;color:white;padding:18px 6%;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:24px;font-weight:800;text-decoration:none;color:white}
+.logo span{color:#64a5ff}
+.back{color:#dce5f5;text-decoration:none;font-size:14px}
+main{max-width:720px;margin:35px auto;padding:0 16px}
+h1{font-size:30px;margin-bottom:10px}
+.intro{color:#68758b;line-height:1.6;margin-bottom:25px}
+.panel{background:white;border:1px solid #e3e9f2;border-radius:16px;padding:22px;margin-bottom:18px}
+.upload{display:block;border:2px dashed #9db7df;border-radius:13px;padding:30px 15px;text-align:center;background:#f7faff;cursor:pointer}
+.upload strong{display:block;margin-bottom:8px;font-size:17px}
+.upload span{color:#718096;font-size:13px}
+input[type=file]{display:none}
+.preview{display:none;margin-top:18px;text-align:center}
+.preview img{max-width:100%;max-height:280px;object-fit:contain;border-radius:10px}
+.filename{font-size:13px;color:#68758b;margin-top:9px;overflow-wrap:anywhere}
+.control{margin-top:20px}
+.control label{display:block;font-weight:bold;font-size:14px;margin-bottom:9px}
+input[type=range]{width:100%;accent-color:#3478e5}
+select,input[type=number]{width:100%;padding:12px;border:1px solid #dce3ef;border-radius:9px;background:white;font-size:15px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.value{color:#3478e5;font-weight:bold}
+button,.download{display:block;width:100%;padding:14px;border:0;border-radius:10px;background:#3478e5;color:white;font-weight:bold;font-size:15px;text-align:center;text-decoration:none;cursor:pointer;margin-top:18px}
+button:disabled{opacity:.5;cursor:not-allowed}
+.download{display:none;background:#16834c}
+.result{display:none;background:#edf8f1;border-radius:12px;padding:16px;margin-top:18px;line-height:1.8;font-size:14px}
+.status{font-size:13px;color:#65738a;margin-top:12px;line-height:1.5}
+footer{text-align:center;padding:25px;color:#7b8799;font-size:13px}
+@media(max-width:450px){.row{grid-template-columns:1fr}}
 </style>
 </head>
-<body>
-<header>Docu<span>Nest</span></header>
-<main>
-<a href="index.html" style="color:#2468d5;text-decoration:none">← Back to DocuNest</a>
-<h1>Image Compressor</h1>
-<p>Reduce image file size directly on your device. No account or upload required.</p>
 
-<div class="panel">
-<div class="upload">
-<div style="font-size:42px">🖼️</div>
-<strong>Select an image</strong>
-<p class="small">Choose a JPG, PNG or WebP image from your phone.</p>
-<input type="file" id="file" accept="image/jpeg,image/png,image/webp">
+<body>
+<header>
+<a class="logo" href="index.html">Docu<span>Nest</span></a>
+<a class="back" href="index.html">← Back to tools</a>
+</header>
+
+<main>
+<h1>Image Compressor</h1>
+<p class="intro">Compress your images, adjust quality and download smaller files. Your images are processed directly in your browser and are not uploaded to our server.</p>
+
+<section class="panel">
+<label class="upload" for="fileInput">
+<strong>🖼️ Choose an image</strong>
+<span>Tap here to select JPG, PNG or WebP</span>
+</label>
+<input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp">
+
+<div class="preview" id="preview">
+<img id="previewImage" alt="Selected image preview">
+<div class="filename" id="fileName"></div>
 </div>
 
-<img id="preview" class="preview" alt="Selected image preview">
+<div class="control">
+<label for="quality">Compression quality: <span class="value" id="qualityValue">75%</span></label>
+<input id="quality" type="range" min="10" max="100" value="75">
+</div>
 
-<label for="quality">Compression quality: <span id="qualityValue">70%</span></label>
-<input type="range" id="quality" min="10" max="100" value="70">
-
+<div class="control">
 <label for="format">Output format</label>
 <select id="format">
 <option value="image/jpeg">JPG</option>
 <option value="image/webp">WebP</option>
+<option value="image/png">PNG (lossless)</option>
 </select>
+</div>
 
-<button id="compress" disabled>Compress Image</button>
+<div class="control">
+<label>Maximum image width (pixels)</label>
+<input id="maxWidth" type="number" min="1" max="12000" placeholder="Original width (no resizing)">
+</div>
+
+<button id="compressButton" disabled>Compress Image</button>
+
+<div class="status" id="status">Choose an image to begin.</div>
 
 <div class="result" id="result">
-<h3>Compression complete!</h3>
-<div class="stats">
-<div><div class="small">Original size</div><strong id="originalSize"></strong></div>
-<div><div class="small">New size</div><strong id="newSize"></strong></div>
-<div><div class="small">Size reduced</div><strong id="saved"></strong></div>
+<strong>Compression complete!</strong>
+<div id="sizeInfo"></div>
 </div>
-<a id="download" class="download" download="docunest-compressed.jpg">Download compressed image</a>
-<p class="small" id="note"></p>
-</div>
-</div>
+
+<a id="downloadButton" class="download" download="docunest-image">Download Compressed Image</a>
+</section>
 </main>
-<footer>DocuNest · Your digital toolbox</footer>
+
+<footer>© 2026 DocuNest · Your digital toolbox</footer>
 
 <script>
-const fileInput=document.getElementById("file");
+const fileInput=document.getElementById("fileInput");
+const preview=document.getElementById("preview");
+const previewImage=document.getElementById("previewImage");
+const fileName=document.getElementById("fileName");
 const quality=document.getElementById("quality");
 const qualityValue=document.getElementById("qualityValue");
 const format=document.getElementById("format");
-const preview=document.getElementById("preview");
-const compress=document.getElementById("compress");
+const maxWidth=document.getElementById("maxWidth");
+const compressButton=document.getElementById("compressButton");
+const downloadButton=document.getElementById("downloadButton");
+const status=document.getElementById("status");
 const result=document.getElementById("result");
-let selectedFile=null;
-let image=new Image();
-let originalUrl=null;
-let outputUrl=null;
+const sizeInfo=document.getElementById("sizeInfo");
 
-function sizeText(bytes){
- if(bytes<1024)return bytes+" B";
- if(bytes<1048576)return (bytes/1024).toFixed(1)+" KB";
- return (bytes/1048576).toFixed(2)+" MB";
+let selectedFile=null;
+let imageObject=null;
+let previewURL=null;
+let downloadURL=null;
+
+function formatBytes(bytes){
+if(bytes<1024)return bytes+" B";
+if(bytes<1024*1024)return (bytes/1024).toFixed(1)+" KB";
+return (bytes/(1024*1024)).toFixed(2)+" MB";
 }
 
-fileInput.addEventListener("change",()=>{
- selectedFile=fileInput.files[0];
- result.style.display="none";
- if(originalUrl)URL.revokeObjectURL(originalUrl);
- if(outputUrl)URL.revokeObjectURL(outputUrl);
- outputUrl=null;
- if(!selectedFile)return;
- if(!selectedFile.type.startsWith("image/")){
-  alert("Please select a valid image.");
-  selectedFile=null;
-  compress.disabled=true;
-  return;
- }
- originalUrl=URL.createObjectURL(selectedFile);
- image.onload=()=>{
-  preview.src=originalUrl;
-  preview.style.display="block";
-  compress.disabled=false;
- };
- image.onerror=()=>{
-  alert("This image could not be opened. Please try another image.");
-  compress.disabled=true;
- };
- image.src=originalUrl;
-});
+function clearDownload(){
+if(downloadURL){
+URL.revokeObjectURL(downloadURL);
+downloadURL=null;
+}
+downloadButton.style.display="none";
+result.style.display="none";
+}
 
 quality.addEventListener("input",()=>{
- qualityValue.textContent=quality.value+"%";
+qualityValue.textContent=quality.value+"%";
 });
 
-compress.addEventListener("click",()=>{
- if(!selectedFile||!image.naturalWidth)return;
- compress.disabled=true;
- compress.textContent="Compressing...";
+fileInput.addEventListener("change",()=>{
+clearDownload();
+selectedFile=null;
+imageObject=null;
+compressButton.disabled=true;
 
- const canvas=document.createElement("canvas");
- canvas.width=image.naturalWidth;
- canvas.height=image.naturalHeight;
- const context=canvas.getContext("2d");
- const outputType=format.value;
+const file=fileInput.files[0];
+if(!file)return;
 
- if(outputType==="image/jpeg"){
-  context.fillStyle="#ffffff";
-  context.fillRect(0,0,canvas.width,canvas.height);
- }
- context.drawImage(image,0,0);
+if(!["image/jpeg","image/png","image/webp"].includes(file.type)){
+status.textContent="Please select a JPG, PNG or WebP image.";
+fileInput.value="";
+return;
+}
 
- canvas.toBlob(blob=>{
-  compress.disabled=false;
-  compress.textContent="Compress Image";
+selectedFile=file;
+status.textContent="Loading image...";
 
-  if(!blob){
-   alert("Compression failed. Please try another image.");
-   return;
-  }
+if(previewURL)URL.revokeObjectURL(previewURL);
+previewURL=URL.createObjectURL(file);
 
-  if(outputUrl)URL.revokeObjectURL(outputUrl);
-  outputUrl=URL.createObjectURL(blob);
+const img=new Image();
 
-  document.getElementById("originalSize").textContent=sizeText(selectedFile.size);
-  document.getElementById("newSize").textContent=sizeText(blob.size);
+img.onload=()=>{
+imageObject=img;
+previewImage.src=previewURL;
+fileName.textContent=file.name+" · "+formatBytes(file.size);
+preview.style.display="block";
+compressButton.disabled=false;
+status.textContent="Image ready. Adjust settings and tap Compress Image.";
+};
 
-  const reduction=(1-blob.size/selectedFile.size)*100;
-  document.getElementById("saved").textContent=
-   reduction>0?reduction.toFixed(1)+"%":reduction.toFixed(1)+"% (larger)";
+img.onerror=()=>{
+selectedFile=null;
+status.textContent="Could not read this image. Please choose another file.";
+URL.revokeObjectURL(previewURL);
+previewURL=null;
+};
+img.src=previewURL;
+});
 
-  const link=document.getElementById("download");
-  const ext=outputType==="image/jpeg"?"jpg":"webp";
-  link.href=outputUrl;
-  link.download="docunest-compressed."+ext;
+compressButton.addEventListener("click",()=>{
+if(!selectedFile||!imageObject)return;
 
-  document.getElementById("note").textContent=
-   reduction>0?"Your image is now smaller.":"This output is not smaller than the original. Try another quality or format.";
+clearDownload();
+compressButton.disabled=true;
+status.textContent="Compressing image...";
 
-  result.style.display="block";
- },outputType,Number(quality.value)/100);
+try{
+let width=imageObject.naturalWidth;
+let height=imageObject.naturalHeight;
+
+const requestedWidth=Number(maxWidth.value);
+
+if(maxWidth.value.trim()!=="" && (!Number.isFinite(requestedWidth)||requestedWidth<1)){
+status.textContent="Enter a valid maximum width.";
+compressButton.disabled=false;
+return;
+}
+
+if(requestedWidth>0 && requestedWidth<width){
+height=Math.round(height*requestedWidth/width);
+width=requestedWidth;
+}
+
+const canvas=document.createElement("canvas");
+canvas.width=width;
+canvas.height=height;
+
+const ctx=canvas.getContext("2d");
+if(!ctx)throw new Error("Canvas is not supported.");
+
+const outputType=format.value;
+
+if(outputType==="image/jpeg"){
+ctx.fillStyle="#ffffff";
+ctx.fillRect(0,0,width,height);
+}
+
+ctx.drawImage(imageObject,0,0,width,height);
+
+const qualityNumber=Number(quality.value)/100;
+
+canvas.toBlob(blob=>{
+compressButton.disabled=false;
+
+if(!blob){
+status.textContent="Compression failed. Please try another format.";
+return;
+}
+
+clearDownload();
+downloadURL=URL.createObjectURL(blob);
+
+const extension=outputType==="image/jpeg"?"jpg":
+outputType==="image/webp"?"webp":"png";
+
+downloadButton.href=downloadURL;
+downloadButton.download="docunest-compressed."+extension;
+downloadButton.style.display="block";
+
+const difference=selectedFile.size-blob.size;
+const percentage=(difference/selectedFile.size)*100;
+
+sizeInfo.innerHTML=
+"Original size: "+formatBytes(selectedFile.size)+"<br>"+
+"New size: "+formatBytes(blob.size)+"<br>"+
+(difference>0
+?"Size reduced by: "+percentage.toFixed(1)+"%"
+:"File size increased by: "+Math.abs(percentage).toFixed(1)+"%");
+
+result.style.display="block";
+status.textContent="Your image is ready to download.";
+
+},outputType,outputType==="image/png"?undefined:qualityNumber);
+
+}catch(error){
+compressButton.disabled=false;
+status.textContent="Something went wrong: "+error.message;
+}
+});
+
+window.addEventListener("beforeunload",()=>{
+if(previewURL)URL.revokeObjectURL(previewURL);
+if(downloadURL)URL.revokeObjectURL(downloadURL);
 });
 </script>
 </body>
