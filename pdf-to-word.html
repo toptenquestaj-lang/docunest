@@ -1,0 +1,205 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<title>PDF to Word Converter - DocuNest</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f4f7fb;color:#172033}
+header{background:#101827;color:white;padding:18px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:22px;font-weight:bold;color:white;text-decoration:none}
+.logo span{color:#60a5fa}
+.back{color:white;text-decoration:none;font-size:14px}
+main{max-width:800px;margin:35px auto;padding:15px}
+h1{font-size:29px;margin-bottom:10px}
+.intro{color:#68758b;line-height:1.6;margin-bottom:25px}
+.panel{background:white;border:1px solid #e3e9f2;border-radius:16px;padding:24px}
+.upload{display:block;border:2px dashed #9db7df;border-radius:12px;padding:28px 15px;text-align:center;background:#f7faff;cursor:pointer}
+.upload strong{display:block;margin-bottom:8px}
+.upload span{font-size:13px;color:#718096}
+input{display:none}
+.details{margin-top:18px;padding:14px;background:#f1f5f9;border-radius:10px;font-size:14px;line-height:1.7}
+button{width:100%;padding:15px;margin-top:18px;border:0;border-radius:9px;background:#2563eb;color:white;font-size:16px;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+.status{margin-top:15px;font-size:14px;line-height:1.6}
+.note{font-size:12px;color:#758096;line-height:1.6;margin-top:18px}
+footer{text-align:center;padding:25px;color:#7b8799;font-size:13px}
+</style>
+</head>
+<body>
+
+<header>
+<a class="logo" href="index.html">Docu<span>Nest</span></a>
+<a class="back" href="index.html">← Back to tools</a>
+</header>
+
+<main>
+<h1>PDF to Word Converter</h1>
+<p class="intro">Extract text from your PDF and convert it into an editable Word document.</p>
+
+<section class="panel">
+<label class="upload" for="pdfInput">
+<strong>📄 Select your PDF file</strong>
+<span>Choose a PDF document from your device</span>
+</label>
+
+<input type="file" id="pdfInput" accept=".pdf,application/pdf">
+
+<div class="details" id="details">No PDF selected.</div>
+
+<button id="convertBtn" disabled>Convert to Word</button>
+<div class="status" id="status">Select a PDF file to begin.</div>
+
+<p class="note">
+This tool extracts selectable text. It does not perform OCR on scanned PDFs.
+Original images, tables, fonts and exact page formatting may not be preserved.
+Your PDF is processed in your browser and is not uploaded to a server.
+</p>
+</section>
+</main>
+
+<footer>© 2026 DocuNest · Your digital toolbox</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.umd.js"></script>
+
+<script>
+const pdfInput=document.getElementById("pdfInput");
+const details=document.getElementById("details");
+const convertBtn=document.getElementById("convertBtn");
+const status=document.getElementById("status");
+
+pdfjsLib.GlobalWorkerOptions.workerSrc=
+"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+let selectedFile=null;
+
+pdfInput.addEventListener("change",()=>{
+selectedFile=pdfInput.files[0]||null;
+convertBtn.disabled=true;
+
+if(!selectedFile){
+details.textContent="No PDF selected.";
+status.textContent="Select a PDF file to begin.";
+return;
+}
+
+if(!selectedFile.name.toLowerCase().endsWith(".pdf")){
+selectedFile=null;
+details.textContent="Please select a PDF file.";
+status.textContent="Unsupported file format.";
+return;
+}
+
+details.innerHTML="<strong>File:</strong> "+
+selectedFile.name+"<br><strong>Size:</strong> "+
+(selectedFile.size/1024).toFixed(1)+" KB";
+
+status.textContent="PDF selected. Ready to convert.";
+convertBtn.disabled=false;
+});
+
+function extractLines(items){
+const lines=[];
+
+items.forEach(item=>{
+const text=item.str.trim();
+if(!text)return;
+
+const y=item.transform[5];
+let line=lines.find(l=>Math.abs(l.y-y)<3);
+
+if(!line){
+line={y:y,parts:[]};
+lines.push(line);
+}
+line.parts.push({x:item.transform[4],text:text});
+});
+
+lines.sort((a,b)=>b.y-a.y);
+
+return lines.map(line=>{
+line.parts.sort((a,b)=>a.x-b.x);
+return line.parts.map(p=>p.text).join(" ");
+}).filter(line=>line.trim());
+}
+
+convertBtn.addEventListener("click",async()=>{
+if(!selectedFile)return;
+
+convertBtn.disabled=true;
+status.textContent="Reading PDF pages...";
+
+try{
+if(!window.docx||!window.pdfjsLib){
+throw new Error("Conversion libraries could not load. Check your internet connection.");
+}
+
+const bytes=await selectedFile.arrayBuffer();
+const pdf=await pdfjsLib.getDocument({data:new Uint8Array(bytes)}).promise;
+
+const children=[];
+
+for(let pageNumber=1;pageNumber<=pdf.numPages;pageNumber++){
+status.textContent="Extracting page "+pageNumber+" of "+pdf.numPages+"...";
+
+const page=await pdf.getPage(pageNumber);
+const content=await page.getTextContent();
+const lines=extractLines(content.items);
+
+if(lines.length===0){
+children.push(new docx.Paragraph({
+children:[new docx.TextRun("[No selectable text on this page]")],
+}));
+}else{
+lines.forEach(line=>{
+children.push(new docx.Paragraph({
+children:[new docx.TextRun(line)]
+}));
+});
+}
+
+if(pageNumber<pdf.numPages){
+children.push(new docx.Paragraph({
+children:[new docx.TextRun("")],
+}));
+}
+}
+
+if(children.length===0){
+throw new Error("No text could be extracted from this PDF.");
+}
+
+status.textContent="Creating Word document...";
+
+const documentFile=new docx.Document({
+sections:[{children:children}]
+});
+
+const blob=await docx.Packer.toBlob(documentFile);
+
+const url=URL.createObjectURL(blob);
+const link=document.createElement("a");
+link.href=url;
+link.download=selectedFile.name.replace(/\.pdf$/i,"")+".docx";
+document.body.appendChild(link);
+link.click();
+link.remove();
+
+setTimeout(()=>URL.revokeObjectURL(url),2000);
+
+status.textContent="Success! Your Word document has been downloaded.";
+
+}catch(error){
+console.error(error);
+status.textContent="Conversion failed: "+error.message;
+}finally{
+convertBtn.disabled=false;
+}
+});
+</script>
+</body>
+</html>
