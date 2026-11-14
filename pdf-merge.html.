@@ -1,0 +1,189 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<title>PDF Merge - DocuNest</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f4f7fc;color:#172033}
+header{background:#101827;color:white;padding:18px 6%;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:24px;font-weight:800;text-decoration:none;color:white}
+.logo span{color:#64a5ff}
+.back{color:#dce5f5;text-decoration:none;font-size:14px}
+main{max-width:720px;margin:35px auto;padding:0 16px}
+h1{font-size:30px;margin-bottom:10px}
+.intro{color:#68758b;line-height:1.6;margin-bottom:25px}
+.panel{background:white;border:1px solid #e3e9f2;border-radius:16px;padding:22px}
+.upload{display:block;border:2px dashed #9db7df;border-radius:13px;padding:30px 15px;text-align:center;background:#f7faff;cursor:pointer}
+.upload strong{display:block;margin-bottom:8px;font-size:17px}
+.upload span{color:#718096;font-size:13px}
+input[type=file]{display:none}
+.file-list{margin-top:20px}
+.file-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;margin-bottom:9px;background:#f4f7fc;border-radius:9px;font-size:13px}
+.file-name{overflow-wrap:anywhere;flex:1}
+.remove{border:0;background:#ffe9e9;color:#bd3333;padding:8px 11px;border-radius:7px;cursor:pointer}
+button{border:0;border-radius:10px;padding:14px;font-weight:bold;cursor:pointer}
+.merge{display:block;width:100%;background:#3478e5;color:white;font-size:15px;margin-top:20px}
+.merge:disabled{opacity:.5;cursor:not-allowed}
+.status{font-size:13px;color:#65738a;margin-top:15px;line-height:1.5}
+.download{display:none;text-align:center;background:#16834c;color:white;padding:14px;border-radius:10px;text-decoration:none;margin-top:16px;font-weight:bold}
+footer{text-align:center;padding:25px;color:#7b8799;font-size:13px}
+</style>
+</head>
+
+<body>
+
+<header>
+<a class="logo" href="index.html">Docu<span>Nest</span></a>
+<a class="back" href="index.html">← Back to tools</a>
+</header>
+
+<main>
+<h1>PDF Merge</h1>
+<p class="intro">Combine multiple PDF files into one document. Select your PDFs and merge them in seconds. Your files stay in your browser.</p>
+
+<section class="panel">
+
+<label class="upload" for="pdfInput">
+<strong>📄 Select PDF files</strong>
+<span>Choose two or more PDF documents</span>
+</label>
+
+<input type="file" id="pdfInput" accept=".pdf,application/pdf" multiple>
+
+<div class="file-list" id="fileList"></div>
+
+<button class="merge" id="mergeButton" disabled>Merge PDF Files</button>
+
+<div class="status" id="status">Select at least two PDF files to begin.</div>
+
+<a class="download" id="downloadLink" download="docunest-merged.pdf">Download Merged PDF</a>
+
+</section>
+</main>
+
+<footer>© 2026 DocuNest · Your digital toolbox</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+
+<script>
+const pdfInput=document.getElementById("pdfInput");
+const fileList=document.getElementById("fileList");
+const mergeButton=document.getElementById("mergeButton");
+const status=document.getElementById("status");
+const downloadLink=document.getElementById("downloadLink");
+
+let files=[];
+let downloadURL=null;
+
+function clearDownload(){
+if(downloadURL){
+URL.revokeObjectURL(downloadURL);
+downloadURL=null;
+}
+downloadLink.style.display="none";
+}
+
+function renderFiles(){
+fileList.innerHTML="";
+
+files.forEach((file,index)=>{
+const item=document.createElement("div");
+item.className="file-item";
+
+const name=document.createElement("span");
+name.className="file-name";
+name.textContent=(index+1)+". "+file.name;
+
+const remove=document.createElement("button");
+remove.className="remove";
+remove.textContent="Remove";
+
+remove.addEventListener("click",()=>{
+files.splice(index,1);
+clearDownload();
+renderFiles();
+status.textContent=files.length+" PDF file(s) selected.";
+});
+
+item.appendChild(name);
+item.appendChild(remove);
+fileList.appendChild(item);
+});
+
+mergeButton.disabled=files.length<2;
+}
+
+pdfInput.addEventListener("change",()=>{
+clearDownload();
+
+const selected=Array.from(pdfInput.files);
+
+const valid=selected.filter(file=>
+file.type==="application/pdf"||
+file.name.toLowerCase().endsWith(".pdf")
+);
+
+const invalid=selected.length-valid.length;
+
+files=valid;
+
+renderFiles();
+
+status.textContent=files.length+" PDF file(s) selected."+
+(invalid?" "+invalid+" invalid file(s) ignored.":"");
+
+pdfInput.value="";
+});
+
+mergeButton.addEventListener("click",async()=>{
+if(files.length<2)return;
+
+if(!window.PDFLib){
+status.textContent="PDF library could not load. Check your internet connection and reload the page.";
+return;
+}
+
+clearDownload();
+mergeButton.disabled=true;
+status.textContent="Merging PDF files. Please wait...";
+
+try{
+const mergedPdf=await PDFLib.PDFDocument.create();
+
+for(const file of files){
+const bytes=await file.arrayBuffer();
+const pdf=await PDFLib.PDFDocument.load(bytes);
+const pages=await mergedPdf.copyPages(pdf,pdf.getPageIndices());
+
+pages.forEach(page=>mergedPdf.addPage(page));
+}
+
+const mergedBytes=await mergedPdf.save();
+
+const blob=new Blob([mergedBytes],{type:"application/pdf"});
+
+downloadURL=URL.createObjectURL(blob);
+downloadLink.href=downloadURL;
+downloadLink.style.display="block";
+
+status.textContent="Successfully merged "+files.length+" PDF files!";
+
+}catch(error){
+status.textContent="Unable to merge. One or more PDFs may be damaged, password-protected or unsupported. "+error.message;
+}finally{
+mergeButton.disabled=files.length<2;
+}
+});
+
+window.addEventListener("beforeunload",()=>{
+if(downloadURL)URL.revokeObjectURL(downloadURL);
+});
+</script>
+
+</body>
+</html>
