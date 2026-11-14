@@ -28,7 +28,20 @@ main{max-width:1100px;margin:auto;padding:35px 18px}
 .filter{border:1px solid #dce2ed;background:white;color:#43506a;padding:9px 15px;border-radius:25px;white-space:nowrap}
 .filter.active{background:#2468d5;color:white;border-color:#2468d5}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.tool{background:white;border:1px solid #e7ebf2;border-radius:15px;padding:19px;text-decoration:none;color:inherit;transition:.2s;min-height:145px}
+
+/* Tool card styling */
+.tool{
+display:block;
+width:100%;
+background:#ffffff !important;
+border:1px solid #e7ebf2;
+border-radius:15px;
+padding:19px;
+text-decoration:none;
+color:inherit;
+transition:.2s;
+min-height:145px;
+}
 .tool:active{transform:scale(.98)}
 .tool .ico{font-size:27px;margin-bottom:13px}
 .tool h3{font-size:16px;margin-bottom:7px}
@@ -40,6 +53,7 @@ main{max-width:1100px;margin:auto;padding:35px 18px}
 .ai p{color:#52627b;line-height:1.6;font-size:14px}
 footer{text-align:center;padding:28px 15px;background:#101827;color:#cbd5e1;font-size:13px;margin-top:40px}
 footer p{margin:7px}
+
 @media(min-width:650px){
 .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 .hero{padding:85px 20px 75px}
@@ -51,6 +65,7 @@ footer p{margin:7px}
 </head>
 
 <body>
+
 <header>
 <div class="logo">Docu<span>Nest</span></div>
 <nav>
@@ -69,6 +84,7 @@ footer p{margin:7px}
 </section>
 
 <main id="tools">
+
 <h2 class="section-title">Explore our tools</h2>
 <p class="sub">Useful digital tools, all in one place.</p>
 
@@ -82,7 +98,6 @@ footer p{margin:7px}
 </div>
 
 <div class="grid" id="grid">
-
 
 <a class="tool" href="pdf-merge.html" data-category="documents" data-name="PDF merge combine documents">
 <div class="ico">📄</div>
@@ -105,69 +120,82 @@ footer p{margin:7px}
 <span class="tag">Open tool</span>
 </a>
 
-
 <a class="tool" href="word-to-pdf.html" data-category="documents" data-name="word to pdf converter">
-  <div class="ico">📄</div>
-  <h3>Word to PDF</h3>
-  <p>Convert Word documents into PDF files.</p>
-  <span class="tag">Open tool</span>
+<div class="ico">📄</div>
+<h3>Word to PDF</h3>
+<p>Convert Word documents into PDF files.</p>
+<span class="tag">Open tool</span>
 </a>
 
 <a class="tool" href="pdf-to-word.html" data-category="documents" data-name="pdf to word converter">
-  <div class="ico">📝</div>
-  <h3>PDF to Word</h3>
-  <p>Convert PDF documents into editable Word files.</p>
-  <span class="tag">Open tool</span>
+<div class="ico">📝</div>
+<h3>PDF to Word</h3>
+<p>Convert PDF documents into editable Word files.</p>
+<span class="tag">Open tool</span>
 </a>
 
-
-
-
-
 <a class="tool" href="#" data-category="documents" data-name="word documents converter editor">
-<div class="ico">📝</div><h3>Word Tools</h3>
+<div class="ico">📝</div>
+<h3>Word Tools</h3>
 <p>Work with Word documents and text files.</p>
-<span class="tag">Coming soon</span></a>
+<span class="tag">Coming soon</span>
+</a>
 
 <a class="tool" href="#" data-category="documents" data-name="excel spreadsheet tools">
-<div class="ico">📊</div><h3>Excel Tools</h3>
+<div class="ico">📊</div>
+<h3>Excel Tools</h3>
 <p>Manage, convert and organize spreadsheets.</p>
-<span class="tag">Coming soon</span></a>
+<span class="tag">Coming soon</span>
+</a>
 
 <a class="tool" href="#" data-category="documents" data-name="powerpoint presentation tools">
-<div class="ico">📽️</div><h3>PowerPoint Tools</h3>
+<div class="ico">📽️</div>
+<h3>PowerPoint Tools</h3>
 <p>Tools for presentations and slides.</p>
-<span class="tag">Coming soon</span></a>
+<span class="tag">Coming soon</span>
+</a>
 
 <a class="tool" href="image-compressor.html" data-category="images" data-name="image compressor resize convert">
-<div class="ico">🖼️</div><h3>Image Tools</h3>
+<div class="ico">🖼️</div>
+<h3>Image Tools</h3>
 <p>Resize, compress and convert images.</p>
-<span class="tag">Open tool</span></a>
+<span class="tag">Open tool</span>
+</a>
 
 <a class="tool" href="#" data-category="media" data-name="video audio converter">
-<div class="ico">🎬</div><h3>Video & Audio</h3>
+<div class="ico">🎬</div>
+<h3>Video & Audio</h3>
 <p>Explore media conversion and editing tools.</p>
-<span class="tag">Coming soon</span></a>
+<span class="tag">Coming soon</span>
+</a>
 
 <a class="tool" href="#" data-category="ai" data-name="AI summarize rewrite translate">
-<div class="ico">✨</div><h3>AI Workspace</h3>
+<div class="ico">✨</div>
+<h3>AI Workspace</h3>
 <p>Summarize, rewrite and translate content.</p>
-<span class="tag">Coming soon</span></a>
+<span class="tag">Coming soon</span>
+</a>
 
 <a class="tool" href="#" data-category="utilities" data-name="developer JSON code formatter">
-<div class="ico">💻</div><h3>Developer Tools</h3>
+<div class="ico">💻</div>
+<h3>Developer Tools</h3>
 <p>Format JSON, encode text and work with code.</p>
-<span class="tag">Coming soon</span></a>
+<span class="tag">Coming soon</span>
+</a>
 
 <a class="tool" href="#" data-category="utilities" data-name="calculator unit converter">
-<div class="ico">🧮</div><h3>Calculators</h3>
+<div class="ico">🧮</div>
+<h3>Calculators</h3>
 <p>Math, unit and everyday calculations.</p>
-<span class="tag">Coming soon</span></a>
+<span class="tag">Coming soon</span>
+</a>
 
 <a class="tool" href="#" data-category="utilities" data-name="QR code barcode generator">
-<div class="ico">🔳</div><h3>QR Code Tools</h3>
+<div class="ico">🔳</div>
+<h3>QR Code Tools</h3>
 <p>Create QR codes for links and information.</p>
-<span class="tag">Coming soon</span></a>
+<span class="tag">Coming soon</span>
+</a>
 
 </div>
 
@@ -177,6 +205,7 @@ footer p{margin:7px}
 <h2>✨ Your AI Workspace</h2>
 <p>Summarize long documents, extract important information, translate text and rewrite content. More AI tools are coming soon.</p>
 </section>
+
 </main>
 
 <footer>
@@ -205,7 +234,10 @@ if(matchesCategory&&matchesSearch)count++;
 document.getElementById("empty").style.display=count?"none":"block";
 }
 
-function searchTools(){updateTools();}
+function searchTools(){
+updateTools();
+}
+
 searchInput.addEventListener("input",updateTools);
 
 filters.forEach(button=>{
@@ -217,8 +249,6 @@ updateTools();
 });
 });
 </script>
+
 </body>
 </html>
-
-
-
