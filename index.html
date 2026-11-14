@@ -7,6 +7,7 @@
 <meta name="theme-color" content="#101827">
 <meta name="description" content="DocuNest - Your all-in-one digital toolbox for documents, images, AI and everyday utilities.">
 <title>DocuNest - Your Digital Toolbox</title>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Arial,sans-serif;background:#f6f8fc;color:#172033}
@@ -48,91 +49,104 @@ footer p{margin:7px}
 }
 </style>
 </head>
+
 <body>
 <header>
-  <div class="logo">Docu<span>Nest</span></div>
-  <nav>
-    <a href="#tools">Tools</a>
-    <a href="#ai">AI Tools</a>
-  </nav>
+<div class="logo">Docu<span>Nest</span></div>
+<nav>
+<a href="#tools">Tools</a>
+<a href="#ai">AI Tools</a>
+</nav>
 </header>
 
 <section class="hero">
-  <h1>Your entire digital toolbox.</h1>
-  <p>Documents, images, files, AI and everyday utilities. Find the right tool and get things done in one place.</p>
-  <div class="search">
-    <input id="search" type="search" placeholder="Search for a tool...">
-    <button onclick="searchTools()">Search</button>
-  </div>
+<h1>Your entire digital toolbox.</h1>
+<p>Documents, images, files, AI and everyday utilities. Find the right tool and get things done in one place.</p>
+<div class="search">
+<input id="search" type="search" placeholder="Search for a tool...">
+<button onclick="searchTools()">Search</button>
+</div>
 </section>
 
 <main id="tools">
-  <h2 class="section-title">Explore our tools</h2>
-  <p class="sub">Useful digital tools, all in one place.</p>
+<h2 class="section-title">Explore our tools</h2>
+<p class="sub">Useful digital tools, all in one place.</p>
 
-  <div class="filters">
-    <button class="filter active" data-category="all">All tools</button>
-    <button class="filter" data-category="documents">Documents</button>
-    <button class="filter" data-category="images">Images</button>
-    <button class="filter" data-category="media">Media</button>
-    <button class="filter" data-category="ai">AI</button>
-    <button class="filter" data-category="utilities">Utilities</button>
-  </div>
+<div class="filters">
+<button class="filter active" data-category="all">All tools</button>
+<button class="filter" data-category="documents">Documents</button>
+<button class="filter" data-category="images">Images</button>
+<button class="filter" data-category="media">Media</button>
+<button class="filter" data-category="ai">AI</button>
+<button class="filter" data-category="utilities">Utilities</button>
+</div>
 
-  <div class="grid" id="grid">
-    <a class="tool" href="#" data-category="documents" data-name="PDF tools merge split compress">
-      <div class="ico">📄</div><h3>PDF Tools</h3>
-      <p>Merge, split, compress and manage PDF files.</p><span class="tag">Coming soon</span>
-    </a>
-    <a class="tool" href="#" data-category="documents" data-name="word documents converter editor">
-      <div class="ico">📝</div><h3>Word Tools</h3>
-      <p>Work with Word documents and text files.</p><span class="tag">Coming soon</span>
-    </a>
-    <a class="tool" href="#" data-category="documents" data-name="excel spreadsheet tools">
-      <div class="ico">📊</div><h3>Excel Tools</h3>
-      <p>Manage, convert and organize spreadsheets.</p><span class="tag">Coming soon</span>
-    </a>
-    <a class="tool" href="#" data-category="documents" data-name="powerpoint presentation tools">
-      <div class="ico">📽️</div><h3>PowerPoint Tools</h3>
-      <p>Tools for presentations and slides.</p><span class="tag">Coming soon</span>
-    </a>
-    <a class="tool" href="image-compressor.html" data-category="images" data-name="image compressor resize convert">
-      <div class="ico">🖼️</div><h3>Image Tools</h3>
-      <p>Resize, compress and convert images.</p><span class="tag">Coming soon</span>
-    </a>
-    <a class="tool" href="#" data-category="media" data-name="video audio converter">
-      <div class="ico">🎬</div><h3>Video & Audio</h3>
-      <p>Explore media conversion and editing tools.</p><span class="tag">Coming soon</span>
-    </a>
-    <a class="tool" href="#" data-category="ai" data-name="AI summarize rewrite translate">
-      <div class="ico">✨</div><h3>AI Workspace</h3>
-      <p>Summarize, rewrite and translate content.</p><span class="tag">Coming soon</span>
-    </a>
-    <a class="tool" href="#" data-category="utilities" data-name="developer JSON code formatter">
-      <div class="ico">💻</div><h3>Developer Tools</h3>
-      <p>Format JSON, encode text and work with code.</p><span class="tag">Coming soon</span>
-    </a>
-    <a class="tool" href="#" data-category="utilities" data-name="calculator unit converter">
-      <div class="ico">🧮</div><h3>Calculators</h3>
-      <p>Math, unit and everyday calculations.</p><span class="tag">Coming soon</span>
-    </a>
-    <a class="tool" href="#" data-category="utilities" data-name="QR code barcode generator">
-      <div class="ico">🔳</div><h3>QR Code Tools</h3>
-      <p>Create QR codes for links and information.</p><span class="tag">Coming soon</span>
-    </a>
-  </div>
-  <div class="empty" id="empty">No matching tools found. Try another search.</div>
+<div class="grid" id="grid">
 
-  <section class="ai" id="ai">
-    <h2>✨ Your AI Workspace</h2>
-    <p>Imagine summarizing long documents, extracting important information, translating text and rewriting content — all from one place. Our AI tools are coming soon.</p>
-  </section>
+<a class="tool" href="#" data-category="documents" data-name="PDF tools merge split compress">
+<div class="ico">📄</div><h3>PDF Tools</h3>
+<p>Merge, split, compress and manage PDF files.</p>
+<span class="tag">Coming soon</span></a>
+
+<a class="tool" href="#" data-category="documents" data-name="word documents converter editor">
+<div class="ico">📝</div><h3>Word Tools</h3>
+<p>Work with Word documents and text files.</p>
+<span class="tag">Coming soon</span></a>
+
+<a class="tool" href="#" data-category="documents" data-name="excel spreadsheet tools">
+<div class="ico">📊</div><h3>Excel Tools</h3>
+<p>Manage, convert and organize spreadsheets.</p>
+<span class="tag">Coming soon</span></a>
+
+<a class="tool" href="#" data-category="documents" data-name="powerpoint presentation tools">
+<div class="ico">📽️</div><h3>PowerPoint Tools</h3>
+<p>Tools for presentations and slides.</p>
+<span class="tag">Coming soon</span></a>
+
+<a class="tool" href="image-compressor.html" data-category="images" data-name="image compressor resize convert">
+<div class="ico">🖼️</div><h3>Image Tools</h3>
+<p>Resize, compress and convert images.</p>
+<span class="tag">Open tool</span></a>
+
+<a class="tool" href="#" data-category="media" data-name="video audio converter">
+<div class="ico">🎬</div><h3>Video & Audio</h3>
+<p>Explore media conversion and editing tools.</p>
+<span class="tag">Coming soon</span></a>
+
+<a class="tool" href="#" data-category="ai" data-name="AI summarize rewrite translate">
+<div class="ico">✨</div><h3>AI Workspace</h3>
+<p>Summarize, rewrite and translate content.</p>
+<span class="tag">Coming soon</span></a>
+
+<a class="tool" href="#" data-category="utilities" data-name="developer JSON code formatter">
+<div class="ico">💻</div><h3>Developer Tools</h3>
+<p>Format JSON, encode text and work with code.</p>
+<span class="tag">Coming soon</span></a>
+
+<a class="tool" href="#" data-category="utilities" data-name="calculator unit converter">
+<div class="ico">🧮</div><h3>Calculators</h3>
+<p>Math, unit and everyday calculations.</p>
+<span class="tag">Coming soon</span></a>
+
+<a class="tool" href="#" data-category="utilities" data-name="QR code barcode generator">
+<div class="ico">🔳</div><h3>QR Code Tools</h3>
+<p>Create QR codes for links and information.</p>
+<span class="tag">Coming soon</span></a>
+
+</div>
+
+<div class="empty" id="empty">No matching tools found. Try another search.</div>
+
+<section class="ai" id="ai">
+<h2>✨ Your AI Workspace</h2>
+<p>Summarize long documents, extract important information, translate text and rewrite content. More AI tools are coming soon.</p>
+</section>
 </main>
 
 <footer>
-  <div class="logo">Docu<span>Nest</span></div>
-  <p>Your digital toolbox, all in one place.</p>
-  <p>© 2026 DocuNest. Built to make everyday tasks easier.</p>
+<div class="logo">Docu<span>Nest</span></div>
+<p>Your digital toolbox, all in one place.</p>
+<p>© 2026 DocuNest. Built to make everyday tasks easier.</p>
 </footer>
 
 <script>
@@ -142,28 +156,33 @@ const filters=[...document.querySelectorAll(".filter")];
 let category="all";
 
 function updateTools(){
- const query=searchInput.value.toLowerCase().trim();
- let count=0;
- cards.forEach(card=>{
-  const matchesCategory=category==="all"||card.dataset.category===category;
-  const matchesSearch=card.dataset.name.toLowerCase().includes(query);
-  card.style.display=matchesCategory&&matchesSearch?"block":"none";
-  if(matchesCategory&&matchesSearch)count++;
- });
- document.getElementById("empty").style.display=count?"none":"block";
+const query=searchInput.value.toLowerCase().trim();
+let count=0;
+
+cards.forEach(card=>{
+const matchesCategory=category==="all"||card.dataset.category===category;
+const matchesSearch=card.dataset.name.toLowerCase().includes(query);
+card.style.display=matchesCategory&&matchesSearch?"block":"none";
+if(matchesCategory&&matchesSearch)count++;
+});
+
+document.getElementById("empty").style.display=count?"none":"block";
 }
 
 function searchTools(){updateTools();}
 searchInput.addEventListener("input",updateTools);
 
 filters.forEach(button=>{
- button.addEventListener("click",()=>{
-  filters.forEach(item=>item.classList.remove("active"));
-  button.classList.add("active");
-  category=button.dataset.category;
-  updateTools();
- });
+button.addEventListener("click",()=>{
+filters.forEach(item=>item.classList.remove("active"));
+button.classList.add("active");
+category=button.dataset.category;
+updateTools();
+});
 });
 </script>
 </body>
 </html>
+
+
+
