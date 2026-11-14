@@ -1,0 +1,210 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<title>PDF Compressor - DocuNest</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f4f7fb;color:#172033}
+header{background:#101827;color:white;padding:18px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:22px;font-weight:bold;color:white;text-decoration:none}
+.logo span{color:#60a5fa}
+.back{color:white;text-decoration:none;font-size:14px}
+main{max-width:720px;margin:35px auto;padding:15px}
+h1{font-size:30px;margin-bottom:10px}
+.intro{color:#68758b;line-height:1.6;margin-bottom:25px}
+.panel{background:white;border:1px solid #e3e9f2;border-radius:16px;padding:25px}
+.upload{display:block;border:2px dashed #9db7df;border-radius:12px;padding:25px 15px;text-align:center;background:#f7faff;cursor:pointer}
+.upload strong{display:block;margin-bottom:8px}
+.upload span{font-size:13px;color:#718096}
+input[type=file]{display:none}
+.details{margin-top:18px;padding:14px;background:#f1f5f9;border-radius:10px;font-size:14px;line-height:1.7}
+.options{margin-top:22px}
+label{display:block;font-weight:bold;margin-bottom:10px}
+select{width:100%;padding:13px;border:1px solid #ccd5e2;border-radius:8px;font-size:15px;background:white}
+button{width:100%;padding:15px;margin-top:20px;border:0;border-radius:9px;background:#2563eb;color:white;font-size:16px;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+.download{display:block;text-align:center;background:#16a34a;color:white;text-decoration:none;padding:15px;border-radius:9px;margin-top:15px;font-weight:bold}
+.status{margin-top:15px;font-size:14px;line-height:1.5}
+.note{font-size:12px;color:#758096;line-height:1.6;margin-top:18px}
+footer{text-align:center;padding:25px;color:#7b8799;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+<a class="logo" href="index.html">Docu<span>Nest</span></a>
+<a class="back" href="index.html">← Back to tools</a>
+</header>
+
+<main>
+<h1>PDF Compressor</h1>
+<p class="intro">Reduce PDF file size by converting its pages into optimized images.</p>
+
+<section class="panel">
+<label class="upload" for="pdfInput">
+<strong>📄 Select a PDF file</strong>
+<span>Choose the PDF you want to compress</span>
+</label>
+<input type="file" id="pdfInput" accept="application/pdf,.pdf">
+
+<div class="details" id="details">No PDF selected.</div>
+
+<div class="options">
+<label for="quality">Compression quality</label>
+<select id="quality">
+<option value="0.85">High quality - larger file</option>
+<option value="0.65" selected>Balanced - recommended</option>
+<option value="0.40">Strong compression - smaller file</option>
+</select>
+</div>
+
+<button id="compressBtn" disabled>Compress PDF</button>
+<div class="status" id="status">Select a PDF to begin.</div>
+<a id="download" class="download" style="display:none" download="docunest-compressed.pdf">Download Compressed PDF</a>
+
+<p class="note">Privacy: Processing happens in your browser. Your PDF is not uploaded to our server. This tool requires an internet connection to load its PDF libraries. Text selection, links and forms are not preserved in the compressed output.</p>
+</section>
+</main>
+
+<footer>© 2026 DocuNest · Your digital toolbox</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+const input=document.getElementById("pdfInput");
+const details=document.getElementById("details");
+const button=document.getElementById("compressBtn");
+const status=document.getElementById("status");
+const download=document.getElementById("download");
+
+pdfjsLib.GlobalWorkerOptions.workerSrc=
+"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+let selectedFile=null;
+let outputURL=null;
+
+input.addEventListener("change",()=>{
+selectedFile=input.files[0]||null;
+if(outputURL)URL.revokeObjectURL(outputURL);
+outputURL=null;
+download.style.display="none";
+
+if(!selectedFile){
+details.textContent="No PDF selected.";
+button.disabled=true;
+return;
+}
+
+if(selectedFile.type!=="application/pdf" &&
+!selectedFile.name.toLowerCase().endsWith(".pdf")){
+details.textContent="Please select a valid PDF.";
+button.disabled=true;
+return;
+}
+
+details.innerHTML="<strong>File:</strong> "+selectedFile.name+
+"<br><strong>Original size:</strong> "+formatSize(selectedFile.size);
+status.textContent="PDF selected. Choose quality and compress.";
+button.disabled=false;
+});
+
+function formatSize(bytes){
+return bytes<1024*1024?
+(bytes/1024).toFixed(1)+" KB":
+(bytes/(1024*1024)).toFixed(2)+" MB";
+}
+
+button.addEventListener("click",async()=>{
+if(!selectedFile)return;
+
+button.disabled=true;
+download.style.display="none";
+status.textContent="Loading PDF...";
+
+try{
+const quality=Number(document.getElementById("quality").value);
+const bytes=await selectedFile.arrayBuffer();
+
+const pdf=await pdfjsLib.getDocument({
+data:new Uint8Array(bytes)
+}).promise;
+
+const {jsPDF}=window.jspdf;
+let output=null;
+
+for(let pageNumber=1;pageNumber<=pdf.numPages;pageNumber++){
+status.textContent="Compressing page "+pageNumber+
+" of "+pdf.numPages+"...";
+
+const page=await pdf.getPage(pageNumber);
+const scale=1.25;
+const viewport=page.getViewport({scale});
+
+const canvas=document.createElement("canvas");
+const context=canvas.getContext("2d");
+
+canvas.width=Math.floor(viewport.width);
+canvas.height=Math.floor(viewport.height);
+
+await page.render({
+canvasContext:context,
+viewport:viewport
+}).promise;
+
+const image=canvas.toDataURL("image/jpeg",quality);
+
+const width=viewport.width*0.75;
+const height=viewport.height*0.75;
+
+if(!output){
+output=new jsPDF({
+orientation:width>height?"landscape":"portrait",
+unit:"pt",
+format:[width,height],
+compress:true
+});
+}else{
+output.addPage([width,height],width>height?"landscape":"portrait");
+}
+
+output.addImage(image,"JPEG",0,0,width,height,undefined,"FAST");
+canvas.width=1;
+canvas.height=1;
+}
+
+status.textContent="Preparing compressed PDF...";
+const blob=output.output("blob");
+outputURL=URL.createObjectURL(blob);
+
+download.href=outputURL;
+download.style.display="block";
+download.download="docunest-compressed.pdf";
+
+const reduction=((selectedFile.size-blob.size)/selectedFile.size)*100;
+
+details.innerHTML="<strong>Original size:</strong> "+
+formatSize(selectedFile.size)+
+"<br><strong>Compressed size:</strong> "+formatSize(blob.size)+
+"<br><strong>Pages:</strong> "+pdf.numPages+
+"<br><strong>Size reduction:</strong> "+
+(reduction>0?reduction.toFixed(1)+"%":
+"None - output is "+Math.abs(reduction).toFixed(1)+"% larger");
+
+status.textContent=reduction>0?
+"Compression complete! Download your PDF below.":
+"The output is larger than the original. Try another quality setting.";
+
+}catch(error){
+console.error(error);
+status.textContent="Compression failed. Try another PDF file.";
+}finally{
+button.disabled=false;
+}
+});
+</script>
+</body>
+</html>
