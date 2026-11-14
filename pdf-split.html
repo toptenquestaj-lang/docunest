@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<title>PDF Splitter - DocuNest</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:Arial,sans-serif;
+  background:#f4f7fb;
+  color:#172033;
+}
+header{
+  background:#101827;
+  color:white;
+  padding:18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.logo{font-size:22px;font-weight:bold;color:white;text-decoration:none}
+.logo span{color:#60a5fa}
+.back{color:white;text-decoration:none;font-size:14px}
+main{max-width:720px;margin:35px auto;padding:15px}
+h1{font-size:30px;margin-bottom:10px}
+.intro{color:#68758b;line-height:1.6;margin-bottom:25px}
+.panel{
+  background:white;
+  border:1px solid #e3e9f2;
+  border-radius:16px;
+  padding:25px;
+  box-shadow:0 5px 20px rgba(0,0,0,.04);
+}
+.upload{
+  display:block;
+  border:2px dashed #9db7df;
+  border-radius:12px;
+  padding:25px 15px;
+  text-align:center;
+  background:#f7faff;
+  cursor:pointer;
+}
+.upload strong{display:block;margin-bottom:8px}
+.upload span{font-size:13px;color:#718096}
+input[type=file]{display:none}
+.details{
+  margin-top:20px;
+  padding:14px;
+  background:#f1f5f9;
+  border-radius:10px;
+  line-height:1.7;
+  font-size:14px;
+}
+.pages{
+  display:flex;
+  gap:12px;
+  margin-top:20px;
+}
+.pages div{flex:1}
+label{display:block;font-weight:bold;margin-bottom:8px}
+input[type=number]{
+  width:100%;
+  padding:13px;
+  border:1px solid #ccd5e2;
+  border-radius:8px;
+  font-size:16px;
+}
+button{
+  width:100%;
+  padding:15px;
+  margin-top:20px;
+  border:0;
+  border-radius:9px;
+  background:#2563eb;
+  color:white;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+button:disabled{opacity:.5;cursor:not-allowed}
+.download{
+  display:block;
+  text-align:center;
+  background:#16a34a;
+  color:white;
+  text-decoration:none;
+  padding:15px;
+  border-radius:9px;
+  margin-top:15px;
+  font-weight:bold;
+}
+.status{margin-top:15px;font-size:14px;line-height:1.5}
+footer{text-align:center;padding:25px;color:#7b8799;font-size:13px}
+@media(max-width:480px){
+  .pages{gap:8px}
+  .panel{padding:18px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <a class="logo" href="index.html">Docu<span>Nest</span></a>
+  <a class="back" href="index.html">← Back to tools</a>
+</header>
+
+<main>
+  <h1>PDF Splitter</h1>
+  <p class="intro">
+    Extract the pages you need from a PDF document.
+    Select a page range and download it as a new PDF.
+  </p>
+
+  <section class="panel">
+
+    <label class="upload" for="pdfInput">
+      <strong>📄 Select a PDF file</strong>
+      <span>Choose the PDF you want to split</span>
+    </label>
+
+    <input type="file" id="pdfInput" accept=".pdf,application/pdf">
+
+    <div class="details" id="fileDetails">
+      No PDF selected.
+    </div>
+
+    <div class="pages">
+      <div>
+        <label for="startPage">Starting page</label>
+        <input type="number" id="startPage" min="1" value="1">
+      </div>
+
+      <div>
+        <label for="endPage">Ending page</label>
+        <input type="number" id="endPage" min="1" value="1">
+      </div>
+    </div>
+
+    <button id="splitButton" disabled>
+      Split PDF
+    </button>
+
+    <div class="status" id="status">
+      Select a PDF to begin.
+    </div>
+
+    <a id="downloadLink" class="download"
+       style="display:none" download="docunest-split.pdf">
+      Download Split PDF
+    </a>
+
+  </section>
+</main>
+
+<footer>
+  © 2026 DocuNest · Your digital toolbox
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+
+<script>
+const pdfInput = document.getElementById("pdfInput");
+const fileDetails = document.getElementById("fileDetails");
+const startPage = document.getElementById("startPage");
+const endPage = document.getElementById("endPage");
+const splitButton = document.getElementById("splitButton");
+const status = document.getElementById("status");
+const downloadLink = document.getElementById("downloadLink");
+
+let selectedFile = null;
+let totalPages = 0;
+let downloadURL = null;
+
+function clearDownload(){
+  if(downloadURL){
+    URL.revokeObjectURL(downloadURL);
+    downloadURL = null;
+  }
+  downloadLink.style.display = "none";
+}
+
+pdfInput.addEventListener("change", async function(){
+  clearDownload();
+  selectedFile = null;
+  totalPages = 0;
+  splitButton.disabled = true;
+
+  const file = pdfInput.files[0];
+
+  if(!file) return;
+
+  if(file.type !== "application/pdf" &&
+     !file.name.toLowerCase().endsWith(".pdf")){
+    fileDetails.textContent = "Please select a valid PDF file.";
+    return;
+  }
+
+  try{
+    status.textContent = "Reading PDF...";
+    const bytes = await file.arrayBuffer();
+    const pdf = await PDFLib.PDFDocument.load(bytes);
+
+    selectedFile = file;
+    totalPages = pdf.getPageCount();
+
+    startPage.max = totalPages;
+    endPage.max = totalPages;
+    startPage.value = 1;
+    endPage.value = totalPages;
+
+    fileDetails.innerHTML =
+      "<strong>File:</strong> " + file.name +
+      "<br><strong>Total pages:</strong> " + totalPages;
+
+    status.textContent = "PDF ready. Choose your page range.";
+    splitButton.disabled = false;
+
+  }catch(error){
+    fileDetails.textContent = "Could not read this PDF.";
+    status.textContent =
+      "The PDF may be damaged, encrypted or password-protected.";
+  }
+});
+
+splitButton.addEventListener("click", async function(){
+  if(!selectedFile) return;
+
+  const start = Number(startPage.value);
+  const end = Number(endPage.value);
+
+  if(!Number.isInteger(start) || !Number.isInteger(end) ||
+     start < 1 || end > totalPages || start > end){
+    status.textContent = "Please enter a valid page range.";
+    return;
+  }
+
+  try{
+    splitButton.disabled = true;
+    clearDownload();
+    status.textContent = "Splitting PDF...";
+
+    const bytes = await selectedFile.arrayBuffer();
+    const sourcePDF = await PDFLib.PDFDocument.load(bytes);
+    const newPDF = await PDFLib.PDFDocument.create();
+
+    const pageIndexes = [];
+
+    for(let i = start - 1; i < end; i++){
+      pageIndexes.push(i);
+    }
+
+    const copiedPages = await newPDF.copyPages(
+      sourcePDF,
+      pageIndexes
+    );
+
+    copiedPages.forEach(page => newPDF.addPage(page));
+
+    const outputBytes = await newPDF.save();
+
+    const blob = new Blob([outputBytes], {
+      type: "application/pdf"
+    });
+
+    downloadURL = URL.createObjectURL(blob);
+    downloadLink.href = downloadURL;
+    downloadLink.style.display = "block";
+
+    status.textContent =
+      "Success! Extracted " + copiedPages.length + " page(s).";
+
+  }catch(error){
+    status.textContent =
+      "Unable to split this PDF. Please try another file.";
+  }finally{
+    splitButton.disabled = false;
+  }
+});
+</script>
+
+</body>
+</html>
