@@ -1,0 +1,238 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<title>PDF to JPG Converter - DocuNest</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f4f7fb;color:#172033}
+header{background:#101827;color:white;padding:18px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:22px;font-weight:bold;color:white;text-decoration:none}
+.logo span{color:#60a5ff}
+.back{color:white;text-decoration:none;font-size:14px}
+main{max-width:800px;margin:35px auto;padding:15px}
+h1{font-size:29px;margin-bottom:10px}
+.intro{color:#68758b;line-height:1.6;margin-bottom:25px}
+.panel{background:white;border:1px solid #e3e9f2;border-radius:16px;padding:24px}
+.upload{display:block;border:2px dashed #9db7df;border-radius:12px;padding:28px 15px;text-align:center;background:#f7faff;cursor:pointer}
+.upload strong{display:block;margin-bottom:8px}
+.upload span{font-size:13px;color:#718096}
+input[type=file]{display:none}
+.details{margin-top:18px;padding:14px;background:#f1f5f9;border-radius:10px;font-size:14px;line-height:1.7}
+.setting{margin-top:20px}
+.setting label{display:block;font-size:14px;font-weight:bold;margin-bottom:9px}
+select{width:100%;padding:12px;border:1px solid #dce2ed;border-radius:9px;background:white;font-size:15px}
+button{width:100%;padding:15px;margin-top:18px;border:0;border-radius:9px;background:#2563eb;color:white;font-size:16px;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+.status{margin-top:15px;font-size:14px;line-height:1.6}
+.preview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:20px}
+.preview img{width:100%;border:1px solid #e1e6ef;border-radius:8px;background:white}
+.page{text-align:center;font-size:13px;color:#68758b}
+.note{font-size:12px;color:#758096;line-height:1.6;margin-top:18px}
+footer{text-align:center;padding:25px;color:#7b8799;font-size:13px}
+</style>
+</head>
+<body>
+
+<header>
+<a class="logo" href="index.html">Docu<span>Nest</span></a>
+<a class="back" href="index.html">← Back to tools</a>
+</header>
+
+<main>
+<h1>PDF to JPG Converter</h1>
+<p class="intro">Convert PDF pages into high-quality JPG images and download them together.</p>
+
+<section class="panel">
+
+<label class="upload" for="pdfInput">
+<strong>🖼️ Select a PDF document</strong>
+<span>Choose a PDF file from your device</span>
+</label>
+
+<input type="file" id="pdfInput" accept=".pdf,application/pdf">
+
+<div class="details" id="details">No PDF selected.</div>
+
+<div class="setting">
+<label for="quality">Image quality</label>
+<select id="quality">
+<option value="1.5">Standard</option>
+<option value="2" selected>High quality</option>
+<option value="3">Very high quality</option>
+</select>
+</div>
+
+<button id="convertBtn" disabled>Convert PDF to JPG</button>
+<button id="downloadBtn" disabled>Download All Images (ZIP)</button>
+
+<div class="status" id="status">Select a PDF file to begin.</div>
+<div class="preview" id="preview"></div>
+
+<p class="note">
+Each PDF page becomes a separate JPG image. All images are packed into
+one ZIP file. Higher quality settings create larger images and files.
+Your PDF is processed in your browser and is not uploaded to a server.
+An internet connection is required for the conversion libraries.
+</p>
+</section>
+</main>
+
+<footer>© 2026 DocuNest · Your digital toolbox</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<script>
+const pdfInput=document.getElementById("pdfInput");
+const details=document.getElementById("details");
+const quality=document.getElementById("quality");
+const convertBtn=document.getElementById("convertBtn");
+const downloadBtn=document.getElementById("downloadBtn");
+const status=document.getElementById("status");
+const preview=document.getElementById("preview");
+
+pdfjsLib.GlobalWorkerOptions.workerSrc=
+"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+let selectedFile=null;
+let zipBlob=null;
+let fileName="document";
+let previewUrls=[];
+
+function clearPreviews(){
+previewUrls.forEach(url=>URL.revokeObjectURL(url));
+previewUrls=[];
+preview.innerHTML="";
+}
+
+pdfInput.addEventListener("change",async()=>{
+selectedFile=pdfInput.files[0]||null;
+zipBlob=null;
+clearPreviews();
+convertBtn.disabled=true;
+downloadBtn.disabled=true;
+
+if(!selectedFile){
+details.textContent="No PDF selected.";
+status.textContent="Select a PDF file to begin.";
+return;
+}
+
+if(!selectedFile.name.toLowerCase().endsWith(".pdf")){
+selectedFile=null;
+details.textContent="Please select a PDF file.";
+status.textContent="Unsupported file format.";
+return;
+}
+
+fileName=selectedFile.name.replace(/\.pdf$/i,"");
+
+try{
+const bytes=await selectedFile.arrayBuffer();
+const pdf=await pdfjsLib.getDocument({data:new Uint8Array(bytes)}).promise;
+
+details.innerHTML="<strong>File:</strong> "+selectedFile.name+
+"<br><strong>Size:</strong> "+(selectedFile.size/1024).toFixed(1)+" KB"+
+"<br><strong>Pages:</strong> "+pdf.numPages;
+
+convertBtn.disabled=false;
+status.textContent="PDF ready. Choose quality and convert.";
+
+}catch(error){
+details.textContent="Could not read this PDF.";
+status.textContent="Error: "+error.message;
+}
+});
+
+convertBtn.addEventListener("click",async()=>{
+if(!selectedFile)return;
+
+convertBtn.disabled=true;
+downloadBtn.disabled=true;
+zipBlob=null;
+clearPreviews();
+
+try{
+const bytes=await selectedFile.arrayBuffer();
+const pdf=await pdfjsLib.getDocument({data:new Uint8Array(bytes)}).promise;
+const zip=new JSZip();
+const scale=Number(quality.value);
+
+for(let i=1;i<=pdf.numPages;i++){
+status.textContent="Converting page "+i+" of "+pdf.numPages+"...";
+
+const page=await pdf.getPage(i);
+const viewport=page.getViewport({scale:scale});
+const canvas=document.createElement("canvas");
+const context=canvas.getContext("2d");
+
+canvas.width=Math.ceil(viewport.width);
+canvas.height=Math.ceil(viewport.height);
+
+await page.render({
+canvasContext:context,
+viewport:viewport
+}).promise;
+
+const blob=await new Promise(resolve=>{
+canvas.toBlob(resolve,"image/jpeg",0.92);
+});
+
+if(!blob)throw new Error("Could not create JPG image.");
+
+zip.file(fileName+"-page-"+i+".jpg",blob);
+
+const url=URL.createObjectURL(blob);
+previewUrls.push(url);
+
+const wrapper=document.createElement("div");
+wrapper.className="page";
+
+const img=document.createElement("img");
+img.src=url;
+img.alt="Page "+i;
+
+const label=document.createElement("p");
+label.textContent="Page "+i;
+
+wrapper.appendChild(img);
+wrapper.appendChild(label);
+preview.appendChild(wrapper);
+
+canvas.width=0;
+canvas.height=0;
+}
+
+status.textContent="Creating ZIP file...";
+zipBlob=await zip.generateAsync({type:"blob"});
+
+downloadBtn.disabled=false;
+status.textContent="Success! "+pdf.numPages+" pages converted to JPG.";
+}catch(error){
+console.error(error);
+status.textContent="Conversion failed: "+error.message;
+}finally{
+convertBtn.disabled=false;
+}
+});
+
+downloadBtn.addEventListener("click",()=>{
+if(!zipBlob)return;
+
+const url=URL.createObjectURL(zipBlob);
+const link=document.createElement("a");
+link.href=url;
+link.download=fileName+"-jpg-images.zip";
+document.body.appendChild(link);
+link.click();
+link.remove();
+
+setTimeout(()=>URL.revokeObjectURL(url),3000);
+});
+</script>
+</body>
+</html>
