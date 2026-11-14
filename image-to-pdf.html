@@ -1,0 +1,240 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<title>Image to PDF Converter - DocuNest</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f4f7fb;color:#172033}
+header{background:#101827;color:white;padding:18px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:22px;font-weight:bold;color:white;text-decoration:none}
+.logo span{color:#60a5ff}
+.back{color:white;text-decoration:none;font-size:14px}
+main{max-width:800px;margin:35px auto;padding:15px}
+h1{font-size:29px;margin-bottom:10px}
+.intro{color:#68758b;line-height:1.6;margin-bottom:25px}
+.panel{background:white;border:1px solid #e3e9f2;border-radius:16px;padding:24px}
+.upload{display:block;border:2px dashed #9db7df;border-radius:12px;padding:28px 15px;text-align:center;background:#f7faff;cursor:pointer}
+.upload strong{display:block;margin-bottom:8px}
+.upload span{font-size:13px;color:#718096}
+input[type=file]{display:none}
+.details{margin-top:18px;padding:14px;background:#f1f5f9;border-radius:10px;font-size:14px;line-height:1.7}
+.setting{margin-top:20px}
+.setting label{display:block;font-size:14px;font-weight:bold;margin-bottom:9px}
+select{width:100%;padding:12px;border:1px solid #dce2ed;border-radius:9px;background:white;font-size:15px}
+button{width:100%;padding:15px;margin-top:18px;border:0;border-radius:9px;background:#2563eb;color:white;font-size:16px;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+.status{margin-top:15px;font-size:14px;line-height:1.6}
+.preview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:20px}
+.preview img{width:100%;border:1px solid #e1e6ef;border-radius:8px;background:white}
+.page{text-align:center;font-size:13px;color:#68758b}
+.note{font-size:12px;color:#758096;line-height:1.6;margin-top:18px}
+footer{text-align:center;padding:25px;color:#7b8799;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+<a class="logo" href="index.html">Docu<span>Nest</span></a>
+<a class="back" href="index.html">← Back to tools</a>
+</header>
+
+<main>
+<h1>Image to PDF Converter</h1>
+<p class="intro">Convert multiple images into one PDF document. Arrange your images in the order you want before converting.</p>
+
+<section class="panel">
+<label class="upload" for="imageInput">
+<strong>🖼️ Select Images</strong>
+<span>Choose JPG, PNG or WebP images from your device</span>
+</label>
+
+<input type="file" id="imageInput" accept="image/jpeg,image/png,image/webp" multiple>
+
+<div class="details" id="details">No images selected.</div>
+
+<div class="setting">
+<label for="pageSize">PDF page size</label>
+<select id="pageSize">
+<option value="a4">A4</option>
+<option value="letter">Letter</option>
+<option value="fit">Fit to image</option>
+</select>
+</div>
+
+<button id="convertBtn" disabled>Convert Images to PDF</button>
+
+<div class="status" id="status">Select images to begin.</div>
+<div class="preview" id="preview"></div>
+
+<p class="note">
+Each image becomes a separate PDF page. Images are fitted inside the selected page size while maintaining their proportions. Your images are processed in your browser and are not uploaded to a server. An internet connection is required for the PDF library.
+</p>
+</section>
+</main>
+
+<footer>© 2026 DocuNest · Your digital toolbox</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const imageInput=document.getElementById("imageInput");
+const details=document.getElementById("details");
+const pageSize=document.getElementById("pageSize");
+const convertBtn=document.getElementById("convertBtn");
+const status=document.getElementById("status");
+const preview=document.getElementById("preview");
+
+let selectedFiles=[];
+
+imageInput.addEventListener("change",()=>{
+selectedFiles=Array.from(imageInput.files||[]);
+preview.innerHTML="";
+
+if(!selectedFiles.length){
+details.textContent="No images selected.";
+convertBtn.disabled=true;
+status.textContent="Select images to begin.";
+return;
+}
+
+const validFiles=selectedFiles.filter(file=>
+["image/jpeg","image/png","image/webp"].includes(file.type)
+);
+
+if(validFiles.length!==selectedFiles.length){
+selectedFiles=validFiles;
+}
+
+if(!selectedFiles.length){
+details.textContent="No supported images selected.";
+convertBtn.disabled=true;
+status.textContent="Please select JPG, PNG or WebP images.";
+return;
+}
+
+details.innerHTML="<strong>Images selected:</strong> "+selectedFiles.length+
+"<br><strong>Total size:</strong> "+
+(selectedFiles.reduce((sum,file)=>sum+file.size,0)/1024).toFixed(1)+" KB";
+
+selectedFiles.forEach((file,index)=>{
+const url=URL.createObjectURL(file);
+const wrapper=document.createElement("div");
+wrapper.className="page";
+const img=document.createElement("img");
+img.src=url;
+img.alt="Selected image "+(index+1);
+const label=document.createElement("p");
+label.textContent=(index+1)+". "+file.name;
+wrapper.appendChild(img);
+wrapper.appendChild(label);
+preview.appendChild(wrapper);
+});
+
+convertBtn.disabled=false;
+status.textContent="Images ready. Choose a page size and convert.";
+});
+
+function loadImage(file){
+return new Promise((resolve,reject)=>{
+const url=URL.createObjectURL(file);
+const img=new Image();
+img.onload=()=>{
+URL.revokeObjectURL(url);
+resolve(img);
+};
+img.onerror=()=>{
+URL.revokeObjectURL(url);
+reject(new Error("Could not read "+file.name));
+};
+img.src=url;
+});
+}
+
+convertBtn.addEventListener("click",async()=>{
+if(!selectedFiles.length)return;
+
+convertBtn.disabled=true;
+
+try{
+const {jsPDF}=window.jspdf;
+const format=pageSize.value;
+let pdf=null;
+
+for(let i=0;i<selectedFiles.length;i++){
+status.textContent="Adding image "+(i+1)+" of "+selectedFiles.length+"...";
+
+const img=await loadImage(selectedFiles[i]);
+let width,height;
+
+if(format==="a4"){
+width=210;
+height=297;
+}else if(format==="letter"){
+width=215.9;
+height=279.4;
+}else{
+const ratio=img.width/img.height;
+width=210;
+height=width/ratio;
+if(height>297){
+height=297;
+width=height*ratio;
+}
+}
+
+if(!pdf){
+pdf=new jsPDF({
+orientation:width>height?"landscape":"portrait",
+unit:"mm",
+format:format==="fit"?[width,height]:format
+});
+}else{
+pdf.addPage(
+format==="fit"?[width,height]:format,
+width>height?"landscape":"portrait"
+);
+}
+
+const margin=format==="fit"?0:8;
+const availableWidth=width-margin*2;
+const availableHeight=height-margin*2;
+const ratio=Math.min(
+availableWidth/img.width,
+availableHeight/img.height
+);
+
+const finalWidth=img.width*ratio;
+const finalHeight=img.height*ratio;
+const x=(width-finalWidth)/2;
+const y=(height-finalHeight)/2;
+
+const canvas=document.createElement("canvas");
+canvas.width=img.naturalWidth;
+canvas.height=img.naturalHeight;
+const context=canvas.getContext("2d");
+context.fillStyle="#ffffff";
+context.fillRect(0,0,canvas.width,canvas.height);
+context.drawImage(img,0,0);
+
+const data=canvas.toDataURL("image/jpeg",0.92);
+pdf.addImage(data,"JPEG",x,y,finalWidth,finalHeight);
+
+canvas.width=0;
+canvas.height=0;
+}
+
+status.textContent="Creating your PDF...";
+pdf.save("DocuNest-images.pdf");
+status.textContent="Success! Your PDF has been downloaded.";
+}catch(error){
+console.error(error);
+status.textContent="Conversion failed: "+error.message;
+}finally{
+convertBtn.disabled=false;
+}
+});
+</script>
+</body>
+</html>
