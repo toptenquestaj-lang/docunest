@@ -25,7 +25,7 @@ main{max-width:1100px;margin:auto;padding:35px 18px}
 .section-title{font-size:25px;margin-bottom:8px}
 .sub{color:#6c778b;font-size:14px;margin-bottom:22px}
 .filters{display:flex;gap:9px;overflow-x:auto;padding:5px 0 18px}
-.filter{border:1px solid #dce2ed;background:white;color:#43506a;padding:9px 15px;border-radius:25px;white-space:nowrap}
+.filter{border:1px solid #dce2ed;background:white;color:#43506a;padding:9px 15px;border-radius:25px;white-space:nowrap;cursor:pointer}
 .filter.active{background:#2468d5;color:white;border-color:#2468d5}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .tool{display:block;width:100%;background:#ffffff !important;border:1px solid #e7ebf2;border-radius:15px;padding:19px;text-decoration:none;color:inherit;transition:.2s;min-height:145px}
@@ -122,6 +122,13 @@ footer p{margin:7px}
 <div class="ico">🖼️</div>
 <h3>PDF to JPG</h3>
 <p>Convert PDF pages into JPG images and download them together.</p>
+<span class="tag">Open tool</span>
+</a>
+
+<a class="tool" href="image-to-pdf.html" data-category="images" data-name="Image to PDF converter JPG PNG WebP">
+<div class="ico">📑</div>
+<h3>Image to PDF</h3>
+<p>Convert multiple images into one PDF document.</p>
 <span class="tag">Open tool</span>
 </a>
 
@@ -238,5 +245,3 @@ updateTools();
 </script>
 </body>
 </html>
-
-
