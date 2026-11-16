@@ -3,40 +3,43 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101827">
 <title>DocuNest Animation Studio</title>
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#101827;color:white;font-family:Arial,sans-serif}
 header{text-align:center;padding:22px 12px}
 header h1{margin:0;font-size:25px}
-header p{color:#aebbd0;font-size:14px}
+header p{color:#b8c5d8}
 main{max-width:850px;margin:auto;padding:12px}
 .panel{background:#1b2940;padding:17px;border-radius:15px;margin-bottom:14px}
-label{display:block;font-weight:bold;margin-bottom:9px}
-textarea{width:100%;height:115px;background:#101827;color:white;border:1px solid #40516c;border-radius:10px;padding:12px;font-size:15px;resize:vertical}
+label{display:block;font-weight:bold;margin-bottom:10px}
+textarea{width:100%;height:125px;background:#101827;color:white;border:1px solid #40516c;border-radius:10px;padding:13px;font-size:15px;resize:vertical}
 .choices{display:flex;gap:10px}
 .choice{flex:1;padding:14px;border:2px solid #40516c;border-radius:12px;background:#101827;color:white;font-size:16px}
 .choice.active{border-color:#45b9ff;background:#163b5b}
 button{cursor:pointer}
-#generate{width:100%;padding:16px;border:0;border-radius:11px;background:#1688ed;color:white;font-size:17px;font-weight:bold}
+#generate{width:100%;padding:16px;border:0;border-radius:11px;background:#1688ed;color:white;font-size:17px;font-weight:bold;margin-top:12px}
 #generate:disabled{opacity:.5}
-#status{color:#b9c9dd;text-align:center;font-size:14px;margin:12px 0}
-#stage{width:100%;aspect-ratio:16/9;background:#080e19;border-radius:14px;overflow:hidden;position:relative}
-#stage canvas{display:block;width:100%;height:100%}
-#preview{width:100%;display:none;border-radius:12px;margin-top:12px;background:#000}
-#download{display:none;text-align:center;margin-top:12px;padding:14px;background:#168a58;color:white;text-decoration:none;border-radius:10px;font-weight:bold}
-.small{color:#aebbd0;font-size:12px;line-height:1.5}
+#status{text-align:center;color:#b9c9dd;font-size:14px;margin:14px 0}
+#stage{width:100%;aspect-ratio:16/9;background:#080e19;border-radius:14px;overflow:hidden}
+#stage canvas{width:100%;height:100%;display:block}
+#preview{width:100%;display:none;margin-top:12px;border-radius:12px;background:#000}
+#download{display:none;text-align:center;margin-top:12px;padding:15px;background:#168a58;color:white;text-decoration:none;border-radius:10px;font-weight:bold}
+.small{font-size:12px;color:#aebbd0;line-height:1.5}
 </style>
 </head>
-<body>
 
+<body>
 <header>
 <h1>🎬 DocuNest Animation Studio</h1>
-<p>Create animated cartoon stories</p>
+<p>Create your own animated cartoon stories</p>
 </header>
 
 <main>
+
 <div class="panel">
 <label>Choose animation style</label>
 <div class="choices">
@@ -46,25 +49,29 @@ button{cursor:pointer}
 </div>
 
 <div class="panel">
-<label>Describe your story</label>
-<textarea id="story" placeholder="Example: A little rabbit lives in a beautiful forest. One day he meets a friendly lion. They cross a river, climb a mountain and discover a magical castle."></textarea>
-<p class="small">Describe the characters, their adventure and the places they visit.</p>
+<label>Your story</label>
+<textarea id="story" placeholder="A little rabbit lives in a beautiful forest. One morning, he meets a friendly lion. They become friends and go on an adventure. They cross a river, climb a mountain and discover a magical castle."></textarea>
+<p class="small">Describe your characters, adventure and locations.</p>
 <button id="generate">✨ Generate Cartoon Video</button>
-<div id="status">Your animated story will appear below.</div>
+<div id="status">Ready to create your story.</div>
 </div>
 
 <div class="panel">
 <label>Animation preview</label>
 <div id="stage"></div>
 <video id="preview" controls playsinline></video>
-<a id="download" download="docunest-cartoon.webm">⬇ Download Cartoon Video</a>
+<a id="download" download="docunest-cartoon.webm">⬇ Download Video</a>
 </div>
 
-<p class="small">Note: This prototype creates animated 3D models and moving environments. Narration plays through your browser but is not included in the downloaded video yet. Video downloads in WebM format.</p>
+<p class="small">
+This is a procedural cartoon animation prototype. It creates animated models and environments from story keywords. Browser narration is not embedded in the downloaded video yet. Video is exported as WebM.
+</p>
+
 </main>
 
 <script type="module">
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+import * as THREE from
+"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
 
 const stage=document.getElementById("stage");
 const status=document.getElementById("status");
@@ -72,88 +79,195 @@ const generate=document.getElementById("generate");
 const preview=document.getElementById("preview");
 const download=document.getElementById("download");
 
-let mode="2d",renderer,scene,camera,actors=[],worldObjects=[];
-let running=false,animationFrame=0,recordingUrl=null;
+let mode="3d";
+let renderer,scene,camera;
+let actors=[];
+let recordingUrl=null;
+let resizeHandler=null;
 
 document.getElementById("twoD").onclick=()=>{
  mode="2d";
  document.getElementById("twoD").classList.add("active");
  document.getElementById("threeD").classList.remove("active");
 };
+
 document.getElementById("threeD").onclick=()=>{
  mode="3d";
  document.getElementById("threeD").classList.add("active");
  document.getElementById("twoD").classList.remove("active");
 };
 
-function material(color,roughness=0.85){
+function mat(color,roughness=.85){
  return new THREE.MeshStandardMaterial({
-  color,roughness,flatShading:mode==="2d"
+  color,
+  roughness,
+  flatShading:mode==="2d"
  });
 }
+
 function sphere(parent,color,x,y,z,sx,sy,sz){
  const mesh=new THREE.Mesh(
-  new THREE.SphereGeometry(1,mode==="2d"?16:28,mode==="2d"?12:20),
-  material(color)
+  new THREE.SphereGeometry(1,mode==="2d"?18:32,mode==="2d"?14:24),
+  mat(color)
  );
  mesh.position.set(x,y,z);
  mesh.scale.set(sx,sy,sz);
  parent.add(mesh);
  return mesh;
 }
-function cylinder(parent,color,x,y,z,r1,r2,h){
+
+function box(parent,color,x,y,z,sx,sy,sz){
  const mesh=new THREE.Mesh(
-  new THREE.CylinderGeometry(r1,r2,h,mode==="2d"?10:18),
-  material(color)
+  new THREE.BoxGeometry(sx,sy,sz),
+  mat(color)
  );
  mesh.position.set(x,y,z);
  parent.add(mesh);
  return mesh;
 }
-function limb(parent,color,x,y,z){
+
+function cylinder(parent,color,x,y,z,rTop,rBottom,height){
+ const mesh=new THREE.Mesh(
+  new THREE.CylinderGeometry(rTop,rBottom,height,20),
+  mat(color)
+ );
+ mesh.position.set(x,y,z);
+ parent.add(mesh);
+ return mesh;
+}
+
+function makeLimb(parent,color,x,y,z,shoeColor){
  const pivot=new THREE.Group();
  pivot.position.set(x,y,z);
  parent.add(pivot);
- cylinder(pivot,color,0,-.32,0,.13,.16,.7);
- sphere(pivot,color,0,-.67,.02,.15,.15,.16);
+
+ const leg=new THREE.Mesh(
+  new THREE.CapsuleGeometry(.13,.38,5,12),
+  mat(color)
+ );
+ leg.position.y=-.25;
+ pivot.add(leg);
+
+ sphere(pivot,shoeColor,0,-.52,.09,.19,.12,.27);
  return pivot;
 }
 
 function makeCharacter(type){
  const root=new THREE.Group();
- const skin=type==="lion"?0xf5b942:type==="rabbit"?0xf2eee7:0xe7a77c;
- const clothes=type==="lion"?0xc66c24:type==="rabbit"?0x9e76e8:0x2478cf;
 
- sphere(root,clothes,0,1.22,0,.48,.61,.34);
- sphere(root,skin,0,2.05,0,.47,.48,.39);
+ const rabbit=type==="rabbit";
+ const lion=type==="lion";
 
- if(type==="lion"){
-  sphere(root,0xd87823,0,2.08,-.04,.62,.63,.47);
-  sphere(root,0xf6d7a2,0,2.02,.38,.37,.35,.16);
-  sphere(root,0x30251e,0,2.05,.54,.07,.055,.045);
- }else if(type==="rabbit"){
-  sphere(root,skin,-.2,2.68,0,.13,.48,.12);
-  sphere(root,skin,.2,2.68,0,.13,.48,.12);
-  sphere(root,0xf2a4b8,0,1.95,.37,.09,.07,.06);
- }else{
-  sphere(root,0x382b29,0,2.36,-.02,.48,.22,.4);
-  sphere(root,0x382b29,-.35,2.22,.02,.16,.18,.2);
-  sphere(root,0x382b29,.35,2.22,.02,.16,.18,.2);
+ const skin=rabbit?0xf3ece6:lion?0xf4bb56:0xe8aa7f;
+ const clothes=rabbit?0x8054c9:lion?0xe28a28:0x277bd2;
+ const dark=lion?0x66391e:0x38251f;
+ const shoes=0x49352d;
+
+ // Body
+ sphere(root,skin,0,1.43,0,.43,.55,.34);
+ sphere(root,clothes,0,1.35,.04,.47,.49,.36);
+
+ // Collar
+ sphere(root,0xffffff,0,1.72,.29,.18,.09,.07);
+
+ // Pocket
+ if(!rabbit&&!lion){
+  sphere(root,0xffffff,.23,1.42,.38,.11,.12,.035);
  }
 
- sphere(root,0xffffff,-.17,2.13,.35,.09,.12,.07);
- sphere(root,0xffffff,.17,2.13,.35,.09,.12,.07);
- sphere(root,0x20232c,-.15,2.12,.415,.045,.065,.035);
- sphere(root,0x20232c,.19,2.12,.415,.045,.065,.035);
+ // Head
+ sphere(root,skin,0,2.22,0,.49,.51,.42);
 
+ // Arms and legs
  const arms=[
-  limb(root,clothes,-.48,1.58,0),
-  limb(root,clothes,.48,1.58,0)
+  makeLimb(root,clothes,-.48,1.68,0,shoes),
+  makeLimb(root,clothes,.48,1.68,0,shoes)
  ];
+
+ const legColor=rabbit?0xf0e8df:lion?0xc77c32:0x344a73;
  const legs=[
-  limb(root,type==="lion"?0xc66c24:skin,-.22,.72,0),
-  limb(root,type==="lion"?0xc66c24:skin,.22,.72,0)
+  makeLimb(root,legColor,-.22,.85,0,shoes),
+  makeLimb(root,legColor,.22,.85,0,shoes)
  ];
+
+ if(lion){
+  // Mane
+  sphere(root,0xb85b20,0,2.25,-.08,.68,.68,.48);
+
+  for(let i=0;i<12;i++){
+   const a=i*Math.PI*2/12;
+   sphere(root,0xd87928,
+    Math.cos(a)*.52,
+    2.25+Math.sin(a)*.52,
+    -.04,.23,.27,.22);
+  }
+
+  // Face muzzle and nose
+  sphere(root,0xf8d9a5,-.13,2.13,.40,.23,.18,.14);
+  sphere(root,0xf8d9a5,.13,2.13,.40,.23,.18,.14);
+  sphere(root,0x38251f,0,2.19,.53,.09,.07,.06);
+
+  // Ears
+  sphere(root,0xb85b20,-.43,2.64,-.02,.18,.19,.14);
+  sphere(root,0xb85b20,.43,2.64,-.02,.18,.19,.14);
+  sphere(root,0xf3b18b,-.43,2.64,.12,.09,.1,.04);
+  sphere(root,0xf3b18b,.43,2.64,.12,.1,.04);
+
+ }else if(rabbit){
+  // Long ears
+  sphere(root,skin,-.23,2.91,-.02,.17,.55,.15);
+  sphere(root,skin,.23,2.91,-.02,.17,.55,.15);
+  sphere(root,0xe99eae,-.23,2.91,.105,.085,.40,.035);
+  sphere(root,0xe99eae,.23,2.91,.105,.085,.40,.035);
+
+  // Muzzle and nose
+  sphere(root,0xffffff,0,2.08,.38,.23,.16,.12);
+  sphere(root,0xe88ca5,0,2.14,.50,.075,.055,.04);
+
+  // Whiskers
+  for(const side of [-1,1]){
+   sphere(root,0x77706b,side*.16,2.09,.48,.025,.025,.025);
+   sphere(root,0x77706b,side*.24,2.04,.46,.025,.025,.025);
+  }
+
+ }else{
+  // Hair
+  sphere(root,0x35251f,0,2.54,-.03,.50,.24,.42);
+  sphere(root,0x35251f,-.34,2.42,.13,.18,.23,.18);
+  sphere(root,0x35251f,.18,2.53,.25,.19,.19,.14);
+
+  // Ears
+  sphere(root,skin,-.48,2.23,.02,.10,.15,.09);
+  sphere(root,skin,.48,2.23,.02,.10,.15,.09);
+ }
+
+ // Eyes, pupils, highlights and eyebrows
+ for(const side of [-1,1]){
+  sphere(root,0xffffff,side*.18,2.31,.365,.115,.145,.075);
+  sphere(root,0x30241e,side*.17,2.30,.425,.052,.075,.035);
+  sphere(root,0xffffff,side*.15,2.34,.454,.022,.025,.018);
+  sphere(root,dark,side*.18,2.49,.37,.12,.035,.04);
+  sphere(root,0xf3a2a0,side*.31,2.12,.37,.09,.055,.025);
+ }
+
+ // Smile
+ const curve=new THREE.CatmullRomCurve3([
+  new THREE.Vector3(-.12,2.04,.48),
+  new THREE.Vector3(0,1.99,.51),
+  new THREE.Vector3(.12,2.04,.48)
+ ]);
+ root.add(new THREE.Mesh(
+  new THREE.TubeGeometry(curve,16,.022,8,false),
+  mat(dark)
+ ));
+
+ // Tail
+ if(rabbit){
+  sphere(root,0xffffff,0,1.13,-.38,.17,.17,.17);
+ }else if(lion){
+  cylinder(root,0xb85b20,.03,.9,-.42,.045,.07,.65);
+  sphere(root,0x38251f,.03,.56,-.42,.10,.13,.12);
+ }
 
  return {root,arms,legs,type};
 }
@@ -162,53 +276,57 @@ function addTree(x,z,scale=1){
  const tree=new THREE.Group();
  tree.position.set(x,0,z);
  tree.scale.setScalar(scale);
+
  cylinder(tree,0x76502e,0,.8,0,.13,.18,1.6);
  sphere(tree,0x26834e,0,2,0,.75,.9,.65);
  sphere(tree,0x36a65c,-.38,2.15,.05,.48,.55,.45);
  sphere(tree,0x207546,.4,2.15,-.04,.48,.6,.45);
+
  scene.add(tree);
- worldObjects.push(tree);
+}
+
+function addCloud(x,y,z){
+ const cloud=new THREE.Group();
+ cloud.position.set(x,y,z);
+ sphere(cloud,0xffffff,0,0,0,.9,.35,.35);
+ sphere(cloud,0xffffff,-.55,-.04,0,.5,.3,.3);
+ sphere(cloud,0xffffff,.5,-.03,0,.55,.3,.3);
+ scene.add(cloud);
 }
 
 function addCastle(x){
  const castle=new THREE.Group();
- castle.position.set(x,0,-3);
- const stone=material(0xd9d6e9);
- const wall=new THREE.Mesh(new THREE.BoxGeometry(3,2.3,.7),stone);
- wall.position.y=1.15;
- castle.add(wall);
+ castle.position.set(x,0,-4);
+
+ box(castle,0xd9d6e9,0,1.15,0,3,2.3,.7);
+
  for(const dx of [-1.3,1.3]){
-  const tower=new THREE.Mesh(
-   new THREE.CylinderGeometry(.4,.5,3,12),
-   material(0xb8b3d4)
-  );
-  tower.position.set(dx,1.5,0);
-  castle.add(tower);
+  cylinder(castle,0xb8b3d4,dx,1.5,0,.5,.5,3);
   const roof=new THREE.Mesh(
-   new THREE.ConeGeometry(.5,.9,12),
-   material(0x784d9b)
+   new THREE.ConeGeometry(.55,.95,12),
+   mat(0x784d9b)
   );
   roof.position.set(dx,3.45,0);
   castle.add(roof);
  }
+
  scene.add(castle);
- worldObjects.push(castle);
 }
 
 function buildWorld(story){
  scene=new THREE.Scene();
- scene.background=new THREE.Color(mode==="2d"?0x91d8fa:0x72b9e9);
- scene.fog=new THREE.Fog(0x91cce5,25,85);
+ scene.background=new THREE.Color(0x91d8fa);
+ scene.fog=new THREE.Fog(0x91cce5,35,100);
 
- const ambient=new THREE.HemisphereLight(0xffffff,0x637a52,2);
- scene.add(ambient);
+ scene.add(new THREE.HemisphereLight(0xffffff,0x637a52,2));
+
  const sun=new THREE.DirectionalLight(0xffffff,2.5);
  sun.position.set(-5,12,8);
  scene.add(sun);
 
  const ground=new THREE.Mesh(
   new THREE.PlaneGeometry(180,35),
-  material(0x55a65b)
+  mat(0x55a65b)
  );
  ground.rotation.x=-Math.PI/2;
  ground.position.set(35,-.08,-2);
@@ -216,7 +334,7 @@ function buildWorld(story){
 
  const path=new THREE.Mesh(
   new THREE.PlaneGeometry(180,4),
-  material(0xb9a47a)
+  mat(0xb9a47a)
  );
  path.rotation.x=-Math.PI/2;
  path.position.set(35,.01,1);
@@ -228,33 +346,39 @@ function buildWorld(story){
   addTree(-8+i*4.5,-5-(i%3)*2,.7+(i%4)*.12);
  }
 
+ for(let i=0;i<7;i++){
+  addCloud(-8+i*10,7+(i%2)*2,-10);
+ }
+
  const beats=story.match(/[^.!?]+[.!?]*/g)||[story];
- const total= Math.min(6,Math.max(3,beats.length));
+ const total=Math.min(6,Math.max(3,beats.length));
 
  for(let i=0;i<total;i++){
   const x=5+i*11;
   const text=beats[i]||"";
+
   if(/river|water|bridge|stream/i.test(text)){
    const water=new THREE.Mesh(
     new THREE.BoxGeometry(5,.08,12),
-    material(0x35b7e5,.3)
+    mat(0x35b7e5,.3)
    );
    water.position.set(x,.03,-2);
    scene.add(water);
-   worldObjects.push(water);
   }
+
   if(/mountain|climb|hill/i.test(text)){
    const mountain=new THREE.Mesh(
     new THREE.ConeGeometry(4,7,7),
-    material(0x718b9c)
+    mat(0x718b9c)
    );
    mountain.position.set(x,3,-8);
    scene.add(mountain);
-   worldObjects.push(mountain);
   }
+
   if(/castle|treasure|magic|kingdom/i.test(text)){
    addCastle(x+3);
   }
+
   if(/forest|tree|woods/i.test(text)){
    addTree(x,-5,1.5);
    addTree(x+2,-7,1.2);
@@ -265,25 +389,34 @@ function buildWorld(story){
  if(/rabbit|bunny/i.test(story))types.push("rabbit");
  if(/lion/i.test(story))types.push("lion");
  if(/boy|man|child|girl/i.test(story))types.push("boy");
+
  if(types.length===0)types.push("boy");
- if(types.length===1 && /friend|together|meet|with/i.test(story)){
+
+ if(types.length===1&&/friend|together|meet|with/i.test(story)){
   types.push(types[0]==="rabbit"?"lion":"rabbit");
  }
+
  actors=types.slice(0,2).map((type,index)=>{
   const actor=makeCharacter(type);
-  actor.root.position.set(-2-index*2,0,index===0?1:2);
+  actor.root.position.set(-2-index*1.8,0,index===0?1:2);
   scene.add(actor.root);
   return actor;
  });
 
+ const aspect=16/9;
+
  if(mode==="2d"){
-  const aspect=16/9;
-  camera=new THREE.OrthographicCamera(-12*aspect/1.78,12*aspect/1.78,12,-12,.1,200);
+  camera=new THREE.OrthographicCamera(
+   -12*aspect/1.78,
+   12*aspect/1.78,
+   12,-12,.1,200
+  );
   camera.position.set(0,4,25);
  }else{
-  camera=new THREE.PerspectiveCamera(45,16/9,.1,200);
+  camera=new THREE.PerspectiveCamera(45,aspect,.1,200);
   camera.position.set(0,5,14);
  }
+
  camera.lookAt(0,1.5,0);
 }
 
@@ -292,24 +425,17 @@ function setupRenderer(){
   renderer.dispose();
   stage.innerHTML="";
  }
- renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
+
+ renderer=new THREE.WebGLRenderer({
+  antialias:true,
+  preserveDrawingBuffer:true
+ });
+
  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
  renderer.setSize(stage.clientWidth,stage.clientWidth*9/16);
  renderer.outputColorSpace=THREE.SRGBColorSpace;
  stage.appendChild(renderer.domElement);
 }
-window.addEventListener("resize",()=>{
- if(!renderer||!camera)return;
- renderer.setSize(stage.clientWidth,stage.clientWidth*9/16);
- if(camera.isPerspectiveCamera){
-  camera.aspect=stage.clientWidth/(stage.clientWidth*9/16);
- }else{
-  const aspect=stage.clientWidth/(stage.clientWidth*9/16);
-  camera.left=-12*aspect;
-  camera.right=12*aspect;
- }
- camera.updateProjectionMatrix();
-});
 
 function draw(time,duration){
  const progress=Math.min(time/duration,1);
@@ -317,27 +443,35 @@ function draw(time,duration){
 
  actors.forEach((actor,index)=>{
   const root=actor.root;
+  const phase=time*7+index;
+
   root.position.x=travel-index*1.8;
-  root.position.y=Math.abs(Math.sin(time*7+index))*.08;
-  actor.legs[0].rotation.z=Math.sin(time*7+index)*.65;
-  actor.legs[1].rotation.z=-Math.sin(time*7+index)*.65;
-  actor.arms[0].rotation.z=-Math.sin(time*7+index)*.55;
-  actor.arms[1].rotation.z=Math.sin(time*7+index)*.55;
+  root.position.y=Math.abs(Math.sin(phase))*.09;
+
+  actor.legs[0].rotation.z=Math.sin(phase)*.65;
+  actor.legs[1].rotation.z=-Math.sin(phase)*.65;
+
+  actor.arms[0].rotation.z=-Math.sin(phase)*.55;
+  actor.arms[1].rotation.z=Math.sin(phase)*.55;
+
   root.rotation.y=Math.sin(time*1.5)*.05;
  });
 
  camera.position.x+=(travel+2-camera.position.x)*.035;
  camera.lookAt(camera.position.x,1.5,0);
+
  renderer.render(scene,camera);
 }
 
 async function createVideo(){
  const story=document.getElementById("story").value.trim();
+
  if(story.length<15){
-  status.textContent="Please write a longer story first.";
+  status.textContent="Please enter a longer story.";
   return;
  }
- if(!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream){
+
+ if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream){
   status.textContent="Video recording is not supported by this browser.";
   return;
  }
@@ -345,7 +479,13 @@ async function createVideo(){
  generate.disabled=true;
  preview.style.display="none";
  download.style.display="none";
- if(recordingUrl)URL.revokeObjectURL(recordingUrl);
+
+ if(recordingUrl){
+  URL.revokeObjectURL(recordingUrl);
+  recordingUrl=null;
+ }
+
+ if(window.speechSynthesis)window.speechSynthesis.cancel();
 
  try{
   setupRenderer();
@@ -353,56 +493,75 @@ async function createVideo(){
 
   const beats=story.match(/[^.!?]+[.!?]*/g)||[story];
   const duration=Math.min(30,Math.max(14,Math.min(6,beats.length)*4));
-  const canvas=renderer.domElement;
-  const stream=canvas.captureStream(30);
+
+  const stream=renderer.domElement.captureStream(30);
   const chunks=[];
+
   const mime=[
    "video/webm;codecs=vp9",
    "video/webm;codecs=vp8",
    "video/webm"
   ].find(type=>MediaRecorder.isTypeSupported(type));
-  const recorder=new MediaRecorder(stream,mime?{mimeType:mime}:{});
+
+  const recorder=new MediaRecorder(
+   stream,mime?{mimeType:mime}:{}
+  );
 
   recorder.ondataavailable=e=>{
    if(e.data.size>0)chunks.push(e.data);
   };
+
+  recorder.onerror=()=>{
+   status.textContent="Recording failed. Please try again.";
+   generate.disabled=false;
+  };
+
   recorder.onstop=()=>{
    const blob=new Blob(chunks,{type:"video/webm"});
    recordingUrl=URL.createObjectURL(blob);
+
    preview.src=recordingUrl;
    preview.style.display="block";
+
    download.href=recordingUrl;
    download.style.display="block";
+
    status.textContent="Your cartoon video is ready!";
    generate.disabled=false;
   };
 
   if(window.speechSynthesis){
-   window.speechSynthesis.cancel();
    const speech=new SpeechSynthesisUtterance(story);
    speech.rate=.95;
    window.speechSynthesis.speak(speech);
   }
 
   recorder.start();
+
   const start=performance.now();
 
   function animate(now){
    const elapsed=(now-start)/1000;
+
    draw(elapsed,duration);
-   status.textContent="Creating your animated story: "+Math.min(100,Math.round(elapsed/duration*100))+"%";
+
+   status.textContent=
+    "Creating animation: "+
+    Math.min(100,Math.round(elapsed/duration*100))+"%";
+
    if(elapsed<duration){
-    animationFrame=requestAnimationFrame(animate);
+    requestAnimationFrame(animate);
    }else{
-    cancelAnimationFrame(animationFrame);
     if(recorder.state!=="inactive")recorder.stop();
     if(window.speechSynthesis)window.speechSynthesis.cancel();
    }
   }
-  animationFrame=requestAnimationFrame(animate);
+
+  requestAnimationFrame(animate);
+
  }catch(error){
   console.error(error);
-  status.textContent="Something went wrong. Please reload and try again.";
+  status.textContent="Error: "+error.message;
   generate.disabled=false;
   if(window.speechSynthesis)window.speechSynthesis.cancel();
  }
