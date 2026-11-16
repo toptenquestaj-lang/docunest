@@ -1,0 +1,412 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<title>Video Studio - DocuNest</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b1220;color:#f1f5f9;font-family:Arial,sans-serif}
+header{padding:17px 5%;background:#111c30;border-bottom:1px solid #26344b;display:flex;justify-content:space-between;align-items:center}
+header a{color:#a5b4fc;text-decoration:none}
+.logo{font-size:21px;font-weight:bold}
+main{max-width:1100px;margin:auto;padding:25px 16px}
+h1{font-size:30px;margin-bottom:8px}
+.muted{color:#94a3b8;line-height:1.6}
+.tabs{display:flex;gap:9px;flex-wrap:wrap;margin:24px 0}
+.tab{background:#1e293b;border:1px solid #334155;color:white;padding:12px 17px;border-radius:9px;cursor:pointer}
+.tab.active{background:#5145cd;border-color:#8176ff}
+.panel{background:#111c30;border:1px solid #26344b;border-radius:15px;padding:19px;margin-bottom:18px}
+h2{font-size:19px;margin-top:0}
+label{display:block;margin:15px 0 8px;color:#cbd5e1;font-size:14px}
+textarea,input,select{width:100%;padding:13px;border-radius:9px;border:1px solid #334155;background:#0b1220;color:white;font:inherit}
+textarea{min-height:150px;resize:vertical;line-height:1.6}
+button{font:inherit}
+.action{background:#6758ed;color:white;border:0;padding:12px 17px;border-radius:9px;cursor:pointer;font-weight:bold}
+.action:disabled{opacity:.5;cursor:not-allowed}
+.secondary{background:#26364e;color:white;border:1px solid #3b4d67}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+canvas{display:block;width:100%;max-height:550px;object-fit:contain;background:#050914;border-radius:10px;margin-top:12px}
+#status{color:#a5b4fc;margin-top:13px;font-size:14px;line-height:1.5}
+.hidden{display:none!important}
+.scene-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.scene{background:#26364e;padding:8px 12px;border-radius:7px;font-size:13px}
+footer{text-align:center;color:#64748b;padding:30px}
+@media(max-width:600px){
+ h1{font-size:25px}
+ .controls{grid-template-columns:1fr}
+ main{padding:20px 12px}
+ .panel{padding:14px}
+}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="logo">🎬 DocuNest Studio</div>
+ <a href="index.html">← DocuNest Home</a>
+</header>
+
+<main>
+ <h1>Video Studio</h1>
+ <p class="muted">Create animated videos from text and build your own video content.</p>
+
+ <div class="tabs">
+  <button class="tab active" id="textTab">✍️ Text to Video</button>
+  <button class="tab" id="editTab">✂️ Video Editor</button>
+ </div>
+
+ <section id="textPanel" class="panel">
+  <h2>Text to Video Creator</h2>
+  <p class="muted">Write your script. Each new paragraph becomes a separate video scene.</p>
+
+  <label for="script">Your video script</label>
+  <textarea id="script" placeholder="Welcome to my video!
+
+Today we are going to explore something amazing.
+
+Let's get started!"></textarea>
+
+  <div class="controls">
+   <div>
+    <label for="ratio">Video format</label>
+    <select id="ratio">
+     <option value="portrait">Portrait (9:16) - Reels / Shorts</option>
+     <option value="landscape">Landscape (16:9) - YouTube</option>
+     <option value="square">Square (1:1) - Social media</option>
+    </select>
+   </div>
+   <div>
+    <label for="duration">Seconds per scene</label>
+    <select id="duration">
+     <option value="3">3 seconds</option>
+     <option value="4" selected>4 seconds</option>
+     <option value="5">5 seconds</option>
+     <option value="6">6 seconds</option>
+     <option value="8">8 seconds</option>
+    </select>
+   </div>
+  </div>
+
+  <label for="style">Background style</label>
+  <select id="style">
+   <option value="purple">Purple gradient</option>
+   <option value="blue">Ocean blue</option>
+   <option value="sunset">Sunset</option>
+   <option value="dark">Midnight</option>
+   <option value="green">Nature green</option>
+  </select>
+
+  <div style="margin-top:17px">
+   <button class="action" id="generate">Generate Scenes</button>
+  </div>
+
+  <div id="sceneInfo" class="hidden">
+   <label>Generated scenes</label>
+   <div class="scene-list" id="sceneList"></div>
+  </div>
+ </section>
+
+ <section id="editPanel" class="panel hidden">
+  <h2>Video Editor</h2>
+  <p class="muted">Load a video to preview it and prepare a basic trim.</p>
+  <label for="videoFile">Choose a video</label>
+  <input type="file" id="videoFile" accept="video/*">
+  <video id="sourceVideo" controls playsinline style="width:100%;margin-top:15px;max-height:400px;background:#000"></video>
+  <div class="controls">
+   <div>
+    <label for="trimStart">Start time (seconds)</label>
+    <input type="number" id="trimStart" min="0" value="0" step="0.1">
+   </div>
+   <div>
+    <label for="trimEnd">End time (seconds)</label>
+    <input type="number" id="trimEnd" min="0" value="0" step="0.1">
+   </div>
+  </div>
+  <p class="muted">Basic video preview is available in this first version. Exporting trimmed videos will be added in the next development step.</p>
+ </section>
+
+ <section class="panel">
+  <h2>Video Preview</h2>
+  <p class="muted">Your generated video will appear here.</p>
+  <canvas id="preview" width="720" height="1280"></canvas>
+  <div class="controls">
+   <button class="action secondary" id="prev">← Previous</button>
+   <button class="action secondary" id="next">Next →</button>
+  </div>
+  <p id="counter" class="muted">No scenes generated yet.</p>
+  <button class="action" id="export" disabled style="width:100%;margin-top:12px">⬇ Export Video</button>
+  <p id="status">Ready to create your video.</p>
+ </section>
+</main>
+
+<footer>DocuNest © 2026 · Video Studio</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+
+let scenes = [];
+let current = 0;
+let recording = false;
+let frame = null;
+let videoUrl = null;
+
+const canvas = $("preview");
+const ctx = canvas.getContext("2d");
+
+const palettes = {
+ purple:["#21104e","#8b35d8"],
+ blue:["#062c55","#168cc8"],
+ sunset:["#7c244c","#f08b39"],
+ dark:["#080d19","#34445e"],
+ green:["#073c34","#20a477"]
+};
+
+function dimensions(){
+ const ratio = $("ratio").value;
+ if(ratio==="landscape"){
+  canvas.width=1280;canvas.height=720;
+ }else if(ratio==="square"){
+  canvas.width=900;canvas.height=900;
+ }else{
+  canvas.width=720;canvas.height=1280;
+ }
+}
+
+function drawScene(index, progress=0){
+ if(!scenes.length)return;
+ const text=scenes[index];
+ const colors=palettes[$("style").value];
+ const w=canvas.width,h=canvas.height;
+
+ const gradient=ctx.createLinearGradient(0,0,w,h);
+ gradient.addColorStop(0,colors[0]);
+ gradient.addColorStop(1,colors[1]);
+ ctx.fillStyle=gradient;
+ ctx.fillRect(0,0,w,h);
+
+ ctx.globalAlpha=.12;
+ ctx.fillStyle="#ffffff";
+ for(let i=0;i<7;i++){
+  ctx.beginPath();
+  ctx.arc((i*173+100)%w,(i*251+90)%h,70+i*13,0,Math.PI*2);
+  ctx.fill();
+ }
+ ctx.globalAlpha=1;
+
+ ctx.fillStyle="rgba(255,255,255,.75)";
+ ctx.textAlign="center";
+ ctx.font=`bold ${Math.max(20,w*.032)}px Arial`;
+ ctx.fillText("DOCUNEST STUDIO",w/2,h*.16);
+
+ const fontSize=Math.min(w*.085,h*.07);
+ ctx.font=`bold ${fontSize}px Arial`;
+ ctx.fillStyle="white";
+ ctx.textBaseline="middle";
+
+ const words=text.split(/\s+/);
+ const lines=[];
+ let line="";
+ const maxWidth=w*.82;
+
+ for(const word of words){
+  const test=line?line+" "+word:word;
+  if(ctx.measureText(test).width>maxWidth && line){
+   lines.push(line);line=word;
+  }else line=test;
+ }
+ if(line)lines.push(line);
+
+ const lineHeight=fontSize*1.4;
+ const startY=h/2-(lines.length-1)*lineHeight/2;
+ const offset=(1-Math.min(progress*5,1))*35;
+
+ lines.forEach((item,i)=>{
+  ctx.fillText(item,w/2,startY+i*lineHeight+offset);
+ });
+
+ ctx.fillStyle="rgba(255,255,255,.65)";
+ ctx.font=`${Math.max(15,w*.025)}px Arial`;
+ ctx.fillText("Created with DocuNest",w/2,h*.9);
+
+ ctx.fillStyle="rgba(255,255,255,.3)";
+ ctx.fillRect(w*.1,h*.94,w*.8,5);
+ ctx.fillStyle="#ffffff";
+ ctx.fillRect(w*.1,h*.94,w*.8*progress,5);
+}
+
+function showScene(){
+ if(!scenes.length)return;
+ drawScene(current,0.5);
+ $("counter").textContent=`Scene ${current+1} of ${scenes.length}`;
+}
+
+$("generate").onclick=()=>{
+ const script=$("script").value.trim();
+ if(!script){
+  $("status").textContent="Please enter your script first.";
+  return;
+ }
+
+ scenes=script.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
+
+ if(!scenes.length){
+  $("status").textContent="Enter some text to continue.";
+  return;
+ }
+
+ if(scenes.length>30){
+  $("status").textContent="Please keep your video to 30 scenes or fewer.";
+  return;
+ }
+
+ dimensions();
+ current=0;
+ $("sceneInfo").classList.remove("hidden");
+ $("sceneList").innerHTML="";
+ scenes.forEach((s,i)=>{
+  const el=document.createElement("span");
+  el.className="scene";
+  el.textContent="Scene "+(i+1);
+  $("sceneList").appendChild(el);
+ });
+ $("export").disabled=false;
+ showScene();
+ $("status").textContent="Your scenes are ready! Preview them and export your video.";
+};
+
+$("prev").onclick=()=>{
+ if(scenes.length){
+  current=(current-1+scenes.length)%scenes.length;
+  showScene();
+ }
+};
+
+$("next").onclick=()=>{
+ if(scenes.length){
+  current=(current+1)%scenes.length;
+  showScene();
+ }
+};
+
+$("ratio").onchange=()=>{
+ if(scenes.length){
+  dimensions();showScene();
+ }
+};
+
+$("style").onchange=()=>{
+ if(scenes.length)showScene();
+};
+
+$("export").onclick=async()=>{
+ if(!scenes.length||recording)return;
+
+ if(!canvas.captureStream || !window.MediaRecorder){
+  $("status").textContent="Video recording is not supported by this browser.";
+  return;
+ }
+
+ const mimeTypes=[
+  "video/webm;codecs=vp9",
+  "video/webm;codecs=vp8",
+  "video/webm"
+ ];
+ const mimeType=mimeTypes.find(t=>MediaRecorder.isTypeSupported(t));
+ if(!mimeType){
+  $("status").textContent="This browser does not support video export.";
+  return;
+ }
+
+ recording=true;
+ $("export").disabled=true;
+ $("status").textContent="Preparing your video...";
+
+ const stream=canvas.captureStream(30);
+ let chunks=[];
+ let recorder;
+
+ try{
+  recorder=new MediaRecorder(stream,{mimeType});
+  recorder.ondataavailable=e=>{
+   if(e.data.size)chunks.push(e.data);
+  };
+
+  recorder.onstop=()=>{
+   const blob=new Blob(chunks,{type:mimeType});
+   const url=URL.createObjectURL(blob);
+   const a=document.createElement("a");
+   a.href=url;
+   a.download="docunest-video.webm";
+   document.body.appendChild(a);
+   a.click();
+   a.remove();
+   setTimeout(()=>URL.revokeObjectURL(url),60000);
+   stream.getTracks().forEach(t=>t.stop());
+   recording=false;
+   $("export").disabled=false;
+   $("status").textContent="Video exported successfully! Check your Downloads folder.";
+  };
+
+  recorder.start();
+
+  const duration=Number($("duration").value)*1000;
+  const total=duration*scenes.length;
+  const started=performance.now();
+
+  function render(now){
+   const elapsed=now-started;
+   if(elapsed>=total){
+    drawScene(scenes.length-1,1);
+    recorder.stop();
+    return;
+   }
+   const sceneIndex=Math.floor(elapsed/duration);
+   const progress=(elapsed%duration)/duration;
+   drawScene(sceneIndex,progress);
+   $("status").textContent=`Creating video: ${Math.floor(elapsed/total*100)}%`;
+   frame=requestAnimationFrame(render);
+  }
+
+  frame=requestAnimationFrame(render);
+
+ }catch(error){
+  if(recorder && recorder.state!=="inactive")recorder.stop();
+  stream.getTracks().forEach(t=>t.stop());
+  recording=false;
+  $("export").disabled=false;
+  $("status").textContent="Unable to export. Try another browser.";
+ }
+};
+
+$("textTab").onclick=()=>{
+ $("textPanel").classList.remove("hidden");
+ $("editPanel").classList.add("hidden");
+ $("textTab").classList.add("active");
+ $("editTab").classList.remove("active");
+};
+
+$("editTab").onclick=()=>{
+ $("editPanel").classList.remove("hidden");
+ $("textPanel").classList.add("hidden");
+ $("editTab").classList.add("active");
+ $("textTab").classList.remove("active");
+};
+
+$("videoFile").onchange=e=>{
+ const file=e.target.files[0];
+ if(!file)return;
+ if(videoUrl)URL.revokeObjectURL(videoUrl);
+ videoUrl=URL.createObjectURL(file);
+ $("sourceVideo").src=videoUrl;
+ $("sourceVideo").onloadedmetadata=()=>{
+  $("trimStart").value=0;
+  $("trimEnd").value=$("sourceVideo").duration.toFixed(1);
+ };
+ $("status").textContent="Video loaded successfully.";
+};
+</script>
+</body>
+</html>
