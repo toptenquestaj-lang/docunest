@@ -3,214 +3,109 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#101827">
-<title>Video Studio - DocuNest</title>
+<title>DocuNest Animation Studio</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#0b1220;color:#f1f5f9;font-family:Arial,sans-serif}
-header{padding:17px 5%;background:#111c30;border-bottom:1px solid #26344b;display:flex;justify-content:space-between;align-items:center}
-header a{color:#a5b4fc;text-decoration:none}
-.logo{font-size:21px;font-weight:bold}
-main{max-width:1100px;margin:auto;padding:25px 16px}
-h1{font-size:30px;margin-bottom:8px}
-.muted{color:#94a3b8;line-height:1.6}
-.tabs{display:flex;gap:9px;flex-wrap:wrap;margin:24px 0}
-.tab{background:#1e293b;border:1px solid #334155;color:white;padding:12px 17px;border-radius:9px;cursor:pointer}
-.tab.active{background:#5145cd;border-color:#8176ff}
-.panel{background:#111c30;border:1px solid #26344b;border-radius:15px;padding:19px;margin-bottom:18px}
-h2{font-size:19px;margin-top:0}
-label{display:block;margin:15px 0 8px;color:#cbd5e1;font-size:14px}
-textarea,input,select{width:100%;padding:13px;border-radius:9px;border:1px solid #334155;background:#0b1220;color:white;font:inherit}
-textarea{min-height:150px;resize:vertical;line-height:1.6}
+body{margin:0;background:#0b1020;color:#f8fafc;font-family:Arial,sans-serif}
+header{padding:17px 5%;background:#121b30;border-bottom:1px solid #293650;display:flex;justify-content:space-between;align-items:center}
+header a{color:#b6a8ff;text-decoration:none}
+.logo{font-weight:bold;font-size:20px}
+main{max-width:850px;margin:auto;padding:25px 16px 50px}
+h1{font-size:29px;margin:10px 0}
+.muted{color:#9ba9c0;line-height:1.6}
+.panel{background:#141e33;border:1px solid #2b3953;border-radius:17px;padding:19px;margin-top:19px}
+.styles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.style{background:#0e1729;border:2px solid #34425e;color:white;border-radius:13px;padding:10px;text-align:left;cursor:pointer}
+.style.active{border-color:#9b82ff;background:#251d49}
+.style img{width:100%;height:115px;object-fit:cover;border-radius:8px}
+.style strong{display:block;margin-top:9px}
+.style small{color:#aab6cb}
+textarea{width:100%;min-height:145px;background:#0b1426;color:white;border:1px solid #394963;border-radius:11px;padding:14px;font:15px Arial;line-height:1.6;resize:vertical}
+label{display:block;margin:14px 0 9px;font-weight:bold;font-size:14px}
 button{font:inherit}
-.action{background:#6758ed;color:white;border:0;padding:12px 17px;border-radius:9px;cursor:pointer;font-weight:bold}
-.action:disabled{opacity:.5;cursor:not-allowed}
-.secondary{background:#26364e;color:white;border:1px solid #3b4d67}
-.controls{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-canvas{display:block;width:100%;max-height:550px;object-fit:contain;background:#050914;border-radius:10px;margin-top:12px}
-#status{color:#a5b4fc;margin-top:13px;font-size:14px;line-height:1.5}
+.generate{width:100%;padding:16px;border:0;border-radius:11px;background:linear-gradient(110deg,#7455ed,#a34dd2);color:white;font-size:17px;font-weight:bold;cursor:pointer;margin-top:17px}
+.generate:disabled{opacity:.5}
+#stage{width:100%;display:block;background:#080d18;border-radius:12px;max-height:650px;object-fit:contain}
+#status{color:#c4b5fd;font-size:14px;line-height:1.5;margin-top:14px}
+.progress{height:7px;background:#27344c;border-radius:10px;overflow:hidden;margin-top:12px}
+#bar{height:100%;width:0;background:#9b82ff;transition:width .2s}
+.download{display:block;text-align:center;text-decoration:none;background:#147b54;color:white;padding:15px;border-radius:10px;font-weight:bold;margin-top:14px}
 .hidden{display:none!important}
-.scene-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.scene{background:#26364e;padding:8px 12px;border-radius:7px;font-size:13px}
-footer{text-align:center;color:#64748b;padding:30px}
-@media(max-width:600px){
- h1{font-size:25px}
- .controls{grid-template-columns:1fr}
- main{padding:20px 12px}
- .panel{padding:14px}
-}
+footer{text-align:center;color:#6d7d98;padding:25px}
+@media(max-width:500px){main{padding:20px 12px}.panel{padding:14px}.style img{height:90px}h1{font-size:25px}}
 </style>
 </head>
 <body>
-
 <header>
- <div class="logo">🎬 DocuNest Studio</div>
- <a href="index.html">← DocuNest Home</a>
+ <div class="logo">🎬 DocuNest Animation</div>
+ <a href="index.html">← Home</a>
 </header>
 
 <main>
- <h1>Video Studio</h1>
- <p class="muted">Create animated videos from text and build your own video content.</p>
+ <h1>Create Your Cartoon Story</h1>
+ <p class="muted">Choose a style, describe your story and generate an animated video.</p>
 
- <div class="tabs">
-  <button class="tab active" id="textTab">✍️ Text to Video</button>
-  <button class="tab" id="editTab">✂️ Video Editor</button>
- </div>
-
- <section id="textPanel" class="panel">
-  <h2>Text to Video Creator</h2>
-  <p class="muted">Write your script. Each new paragraph becomes a separate video scene.</p>
-
-  <label for="script">Your video script</label>
-  <textarea id="script" placeholder="Welcome to my video!
-
-Today we are going to explore something amazing.
-
-Let's get started!"></textarea>
-
-  <div class="controls">
-   <div>
-    <label for="ratio">Video format</label>
-    <select id="ratio">
-     <option value="portrait">Portrait (9:16) - Reels / Shorts</option>
-     <option value="landscape">Landscape (16:9) - YouTube</option>
-     <option value="square">Square (1:1) - Social media</option>
-    </select>
-   </div>
-   <div>
-    <label for="duration">Seconds per scene</label>
-    <select id="duration">
-     <option value="3">3 seconds</option>
-     <option value="4" selected>4 seconds</option>
-     <option value="5">5 seconds</option>
-     <option value="6">6 seconds</option>
-     <option value="8">8 seconds</option>
-    </select>
-   </div>
+ <section class="panel">
+  <label>1. Choose animation style</label>
+  <div class="styles">
+   <button class="style active" data-style="2d">
+    <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500" alt="Fantasy illustration">
+    <strong>🎨 2D Cartoon</strong>
+    <small>Classic illustrated animation</small>
+   </button>
+   <button class="style" data-style="3d">
+    <img src="https://images.unsplash.com/photo-1535223289827-42f1e9919769?w=500" alt="Digital 3D artwork">
+    <strong>🌟 3D Cartoon</strong>
+    <small>Depth and rounded cartoon look</small>
+   </button>
   </div>
 
-  <label for="style">Background style</label>
-  <select id="style">
-   <option value="purple">Purple gradient</option>
-   <option value="blue">Ocean blue</option>
-   <option value="sunset">Sunset</option>
-   <option value="dark">Midnight</option>
-   <option value="green">Nature green</option>
-  </select>
+  <label for="prompt">2. Describe your story</label>
+  <textarea id="prompt" placeholder="Example: A little rabbit lives in a beautiful forest. One day, he meets a friendly lion. Together they go on an exciting adventure to find a magical treasure."></textarea>
 
-  <div style="margin-top:17px">
-   <button class="action" id="generate">Generate Scenes</button>
-  </div>
-
-  <div id="sceneInfo" class="hidden">
-   <label>Generated scenes</label>
-   <div class="scene-list" id="sceneList"></div>
-  </div>
- </section>
-
- <section id="editPanel" class="panel hidden">
-  <h2>Video Editor</h2>
-  <p class="muted">Load a video to preview it and prepare a basic trim.</p>
-  <label for="videoFile">Choose a video</label>
-  <input type="file" id="videoFile" accept="video/*">
-  <video id="sourceVideo" controls playsinline style="width:100%;margin-top:15px;max-height:400px;background:#000"></video>
-  <div class="controls">
-   <div>
-    <label for="trimStart">Start time (seconds)</label>
-    <input type="number" id="trimStart" min="0" value="0" step="0.1">
-   </div>
-   <div>
-    <label for="trimEnd">End time (seconds)</label>
-    <input type="number" id="trimEnd" min="0" value="0" step="0.1">
-   </div>
-  </div>
-  <p class="muted">Basic video preview is available in this first version. Exporting trimmed videos will be added in the next development step.</p>
+  <button class="generate" id="generate">✨ Generate Cartoon Video</button>
+  <p class="muted" style="font-size:12px">Keep this page open while your video is being created.</p>
  </section>
 
  <section class="panel">
-  <h2>Video Preview</h2>
-  <p class="muted">Your generated video will appear here.</p>
-  <canvas id="preview" width="720" height="1280"></canvas>
-  <div class="controls">
-   <button class="action secondary" id="prev">← Previous</button>
-   <button class="action secondary" id="next">Next →</button>
-  </div>
-  <p id="counter" class="muted">No scenes generated yet.</p>
-  <button class="action" id="export" disabled style="width:100%;margin-top:12px">⬇ Export Video</button>
-  <p id="status">Ready to create your video.</p>
+  <h2 style="font-size:19px;margin-top:0">Your animated story</h2>
+  <canvas id="stage" width="720" height="1280"></canvas>
+  <div class="progress"><div id="bar"></div></div>
+  <p id="status">Your video preview will appear here.</p>
+  <a id="download" class="download hidden" download="docunest-cartoon.webm">⬇ Download Video</a>
  </section>
 </main>
 
-<footer>DocuNest © 2026 · Video Studio</footer>
+<footer>DocuNest Animation Studio · Create your own stories</footer>
 
 <script>
-const $ = id => document.getElementById(id);
+const canvas=document.getElementById("stage");
+const ctx=canvas.getContext("2d");
+const promptBox=document.getElementById("prompt");
+const generateButton=document.getElementById("generate");
+const statusBox=document.getElementById("status");
+const bar=document.getElementById("bar");
+const download=document.getElementById("download");
 
-let scenes = [];
-let current = 0;
-let recording = false;
-let frame = null;
-let videoUrl = null;
+let selectedStyle="2d";
+let busy=false;
+let animationId=null;
 
-const canvas = $("preview");
-const ctx = canvas.getContext("2d");
+document.querySelectorAll(".style").forEach(button=>{
+ button.addEventListener("click",()=>{
+  if(busy)return;
+  document.querySelectorAll(".style").forEach(b=>b.classList.remove("active"));
+  button.classList.add("active");
+  selectedStyle=button.dataset.style;
+ });
+});
 
-const palettes = {
- purple:["#21104e","#8b35d8"],
- blue:["#062c55","#168cc8"],
- sunset:["#7c244c","#f08b39"],
- dark:["#080d19","#34445e"],
- green:["#073c34","#20a477"]
-};
-
-function dimensions(){
- const ratio = $("ratio").value;
- if(ratio==="landscape"){
-  canvas.width=1280;canvas.height=720;
- }else if(ratio==="square"){
-  canvas.width=900;canvas.height=900;
- }else{
-  canvas.width=720;canvas.height=1280;
- }
-}
-
-function drawScene(index, progress=0){
- if(!scenes.length)return;
- const text=scenes[index];
- const colors=palettes[$("style").value];
- const w=canvas.width,h=canvas.height;
-
- const gradient=ctx.createLinearGradient(0,0,w,h);
- gradient.addColorStop(0,colors[0]);
- gradient.addColorStop(1,colors[1]);
- ctx.fillStyle=gradient;
- ctx.fillRect(0,0,w,h);
-
- ctx.globalAlpha=.12;
- ctx.fillStyle="#ffffff";
- for(let i=0;i<7;i++){
-  ctx.beginPath();
-  ctx.arc((i*173+100)%w,(i*251+90)%h,70+i*13,0,Math.PI*2);
-  ctx.fill();
- }
- ctx.globalAlpha=1;
-
- ctx.fillStyle="rgba(255,255,255,.75)";
- ctx.textAlign="center";
- ctx.font=`bold ${Math.max(20,w*.032)}px Arial`;
- ctx.fillText("DOCUNEST STUDIO",w/2,h*.16);
-
- const fontSize=Math.min(w*.085,h*.07);
- ctx.font=`bold ${fontSize}px Arial`;
- ctx.fillStyle="white";
- ctx.textBaseline="middle";
-
+function wrapText(text,maxWidth){
  const words=text.split(/\s+/);
  const lines=[];
  let line="";
- const maxWidth=w*.82;
-
  for(const word of words){
   const test=line?line+" "+word:word;
   if(ctx.measureText(test).width>maxWidth && line){
@@ -218,195 +113,374 @@ function drawScene(index, progress=0){
   }else line=test;
  }
  if(line)lines.push(line);
+ return lines;
+}
 
- const lineHeight=fontSize*1.4;
- const startY=h/2-(lines.length-1)*lineHeight/2;
- const offset=(1-Math.min(progress*5,1))*35;
+function roundedRect(x,y,w,h,r){
+ ctx.beginPath();
+ ctx.roundRect(x,y,w,h,r);
+}
 
- lines.forEach((item,i)=>{
-  ctx.fillText(item,w/2,startY+i*lineHeight+offset);
- });
+function ellipse(x,y,rx,ry,color){
+ ctx.fillStyle=color;
+ ctx.beginPath();
+ ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);
+ ctx.fill();
+}
 
- ctx.fillStyle="rgba(255,255,255,.65)";
- ctx.font=`${Math.max(15,w*.025)}px Arial`;
- ctx.fillText("Created with DocuNest",w/2,h*.9);
+function gradient(x,y,r,color1,color2){
+ const g=ctx.createRadialGradient(x-r*.3,y-r*.4,2,x,y,r*1.5);
+ g.addColorStop(0,color1);
+ g.addColorStop(1,color2);
+ return g;
+}
 
- ctx.fillStyle="rgba(255,255,255,.3)";
- ctx.fillRect(w*.1,h*.94,w*.8,5);
+function drawBackground(t,index){
+ const w=canvas.width,h=canvas.height;
+ const sky=ctx.createLinearGradient(0,0,0,h*.8);
+
+ if(index%3===0){
+  sky.addColorStop(0,"#5b9fe8");
+  sky.addColorStop(1,"#c5e9f8");
+ }else if(index%3===1){
+  sky.addColorStop(0,"#493e82");
+  sky.addColorStop(1,"#e4a66d");
+ }else{
+  sky.addColorStop(0,"#173c65");
+  sky.addColorStop(1,"#72b6a0");
+ }
+ ctx.fillStyle=sky;
+ ctx.fillRect(0,0,w,h);
+
+ // Sun
+ ellipse(w*.78,h*.19,65,65,"#ffe9a6");
+
+ // Moving clouds
+ for(let i=0;i<4;i++){
+  const x=((i*230+t*24)%(w+250))-100;
+  const y=150+i*105;
+  ellipse(x,y,55,23,"rgba(255,255,255,.8)");
+  ellipse(x+35,y-12,45,28,"rgba(255,255,255,.8)");
+  ellipse(x+65,y,48,21,"rgba(255,255,255,.8)");
+ }
+
+ // Hills
+ ctx.fillStyle=index%2?"#538e70":"#4eaa78";
+ ctx.beginPath();
+ ctx.moveTo(0,h*.57);
+ ctx.quadraticCurveTo(w*.25,h*.35,w*.52,h*.57);
+ ctx.quadraticCurveTo(w*.78,h*.35,w,h*.55);
+ ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.fill();
+
+ ctx.fillStyle="#327b56";
+ ctx.beginPath();
+ ctx.moveTo(0,h*.73);
+ ctx.quadraticCurveTo(w*.5,h*.52,w,h*.75);
+ ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.fill();
+
+ // Trees
+ for(let i=0;i<7;i++){
+  const x=((i*145+60+t*8)%(w+120))-50;
+  const y=h*.66+(i%2)*45;
+  ctx.fillStyle="#704b35";
+  ctx.fillRect(x-10,y,20,100);
+  ellipse(x,y-18,48,55,i%2?"#236b4d":"#33865b");
+ }
+}
+
+function drawCharacter(x,y,t,kind){
+ const is3d=selectedStyle==="3d";
+ const bounce=Math.sin(t*5)*12;
+ y+=bounce;
+
+ ctx.save();
+
+ // Shadow
+ ellipse(x,y+190,76,19,"rgba(0,0,0,.2)");
+
+ if(kind==="rabbit"){
+  // Ears
+  ctx.save();
+  ctx.translate(x,y-45);
+  ctx.rotate(Math.sin(t*3)*.08);
+  ellipse(-29,-72,19,60,is3d?"#f3e9dc":"#fff0df");
+  ellipse(29,-72,19,60,is3d?"#f3e9dc":"#fff0df");
+  ellipse(-29,-72,9,45,"#ee9da8");
+  ellipse(29,-72,9,45,"#ee9da8");
+  ctx.restore();
+ }
+
+ const fur=kind==="lion"?"#e5a94d":
+           kind==="rabbit"?"#f7f0e9":"#e9b68b";
+
+ // Body
+ ctx.fillStyle=is3d?gradient(x,y+110,95,fur,"#74503c"):fur;
+ ellipse(x,y+108,68,84,ctx.fillStyle);
+
+ // Arms
+ ctx.strokeStyle=fur;
+ ctx.lineWidth=28;
+ ctx.lineCap="round";
+ ctx.beginPath();
+ ctx.moveTo(x-48,y+85);
+ ctx.lineTo(x-88,y+125+Math.sin(t*4)*10);
+ ctx.moveTo(x+48,y+85);
+ ctx.lineTo(x+88,y+125-Math.sin(t*4)*10);
+ ctx.stroke();
+
+ // Head
+ const headY=y-20;
+ ctx.fillStyle=is3d?gradient(x,headY,91,fur,"#76543f"):fur;
+ ellipse(x,headY,91,91,ctx.fillStyle);
+
+ if(kind==="lion"){
+  for(let i=0;i<12;i++){
+   const a=i*Math.PI/6;
+   ellipse(x+Math.cos(a)*91,headY+Math.sin(a)*87,25,25,"#c77b32");
+  }
+  ellipse(x,headY,78,78,fur);
+ }
+
+ // Eyes
+ ellipse(x-31,headY-12,9,13,"#30251f");
+ ellipse(x+31,headY-12,9,13,"#30251f");
+ ellipse(x-34,headY-17,3,4,"white");
+ ellipse(x+28,headY-17,3,4,"white");
+
+ // Nose and smile
+ ellipse(x,headY+18,11,8,"#8b514b");
+ ctx.strokeStyle="#593b35";
+ ctx.lineWidth=4;
+ ctx.beginPath();
+ ctx.arc(x,headY+24,19,.2,Math.PI-.2);
+ ctx.stroke();
+
+ // Feet
+ ellipse(x-39,y+180,33,17,fur);
+ ellipse(x+39,y+180,33,17,fur);
+
+ ctx.restore();
+}
+
+function drawScene(scene,t,index,total){
+ const w=canvas.width,h=canvas.height;
+ drawBackground(t,index);
+
+ const lower=scene.toLowerCase();
+ const kind=lower.includes("lion")?"lion":
+            lower.includes("rabbit")?"rabbit":"boy";
+
+ // Character movement
+ const travel=Math.sin(t*1.3)*75;
+ drawCharacter(w*.49+travel,h*.57,t,kind);
+
+ // Second character for adventure scenes
+ if(lower.includes("friend")||lower.includes("together")||
+    lower.includes("meets")||lower.includes("animal")){
+  drawCharacter(w*.77-travel*.5,h*.59,t+1,
+    kind==="lion"?"rabbit":"lion");
+ }
+
+ // Scene heading
+ ctx.textAlign="center";
+ ctx.fillStyle="rgba(255,255,255,.9)";
+ ctx.font="bold 31px Arial";
+ ctx.fillText("DOCUNEST STORY",w/2,95);
+
+ // Story text panel
+ ctx.fillStyle="rgba(8,14,29,.76)";
+ roundedRect(45,h*.79,w-90,235,28);
+ ctx.fill();
+
  ctx.fillStyle="#ffffff";
- ctx.fillRect(w*.1,h*.94,w*.8*progress,5);
-}
-
-function showScene(){
- if(!scenes.length)return;
- drawScene(current,0.5);
- $("counter").textContent=`Scene ${current+1} of ${scenes.length}`;
-}
-
-$("generate").onclick=()=>{
- const script=$("script").value.trim();
- if(!script){
-  $("status").textContent="Please enter your script first.";
-  return;
- }
-
- scenes=script.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
-
- if(!scenes.length){
-  $("status").textContent="Enter some text to continue.";
-  return;
- }
-
- if(scenes.length>30){
-  $("status").textContent="Please keep your video to 30 scenes or fewer.";
-  return;
- }
-
- dimensions();
- current=0;
- $("sceneInfo").classList.remove("hidden");
- $("sceneList").innerHTML="";
- scenes.forEach((s,i)=>{
-  const el=document.createElement("span");
-  el.className="scene";
-  el.textContent="Scene "+(i+1);
-  $("sceneList").appendChild(el);
+ ctx.textAlign="center";
+ ctx.textBaseline="middle";
+ ctx.font="bold 34px Arial";
+ const lines=wrapText(scene,w*.78);
+ const lineHeight=48;
+ const visible=lines.slice(0,4);
+ const startY=h*.9-(visible.length-1)*lineHeight/2;
+ visible.forEach((line,i)=>{
+  ctx.fillText(line,w/2,startY+i*lineHeight);
  });
- $("export").disabled=false;
- showScene();
- $("status").textContent="Your scenes are ready! Preview them and export your video.";
-};
 
-$("prev").onclick=()=>{
- if(scenes.length){
-  current=(current-1+scenes.length)%scenes.length;
-  showScene();
- }
-};
+ // Scene indicator
+ ctx.fillStyle="rgba(255,255,255,.7)";
+ ctx.font="22px Arial";
+ ctx.fillText("Scene "+(index+1)+" / "+total,w/2,h*.975);
+}
 
-$("next").onclick=()=>{
- if(scenes.length){
-  current=(current+1)%scenes.length;
-  showScene();
- }
-};
+function createMusic(){
+ const audio=new AudioContext();
+ const destination=audio.createMediaStreamDestination();
+ const master=audio.createGain();
+ master.gain.value=.12;
+ master.connect(destination);
 
-$("ratio").onchange=()=>{
- if(scenes.length){
-  dimensions();showScene();
- }
-};
+ const notes=[261.63,329.63,392,329.63,293.66,349.23,440,349.23];
+ const oscillators=[];
+ notes.forEach((frequency,i)=>{
+  const osc=audio.createOscillator();
+  const gain=audio.createGain();
+  osc.type="sine";
+  osc.frequency.value=frequency;
+  gain.gain.value=.12;
+  osc.connect(gain);
+  gain.connect(master);
+  osc.start();
+  oscillators.push(osc);
+ });
+ return {
+  audio,
+  stream:destination.stream,
+  stop(){
+   oscillators.forEach(o=>{try{o.stop()}catch(e){}});
+   audio.close();
+  }
+ };
+}
 
-$("style").onchange=()=>{
- if(scenes.length)showScene();
-};
+function speak(text){
+ if(!("speechSynthesis" in window))return;
+ window.speechSynthesis.cancel();
+ const utterance=new SpeechSynthesisUtterance(text);
+ utterance.rate=.9;
+ utterance.pitch=1.05;
+ utterance.volume=1;
+ window.speechSynthesis.speak(utterance);
+}
 
-$("export").onclick=async()=>{
- if(!scenes.length||recording)return;
+function splitStory(text){
+ const parts=text.match(/[^.!?]+[.!?]?/g)||[text];
+ return parts.map(s=>s.trim()).filter(Boolean).slice(0,8);
+}
 
- if(!canvas.captureStream || !window.MediaRecorder){
-  $("status").textContent="Video recording is not supported by this browser.";
+function wait(ms){
+ return new Promise(resolve=>setTimeout(resolve,ms));
+}
+
+async function createVideo(){
+ if(busy)return;
+
+ const text=promptBox.value.trim();
+ if(!text){
+  statusBox.textContent="Please enter your story prompt.";
+  promptBox.focus();
   return;
  }
 
- const mimeTypes=[
-  "video/webm;codecs=vp9",
-  "video/webm;codecs=vp8",
-  "video/webm"
- ];
- const mimeType=mimeTypes.find(t=>MediaRecorder.isTypeSupported(t));
- if(!mimeType){
-  $("status").textContent="This browser does not support video export.";
+ const scenes=splitStory(text);
+ if(!scenes.length)return;
+
+ if(!canvas.captureStream||!window.MediaRecorder){
+  statusBox.textContent="Video recording is not supported in this browser.";
   return;
  }
 
- recording=true;
- $("export").disabled=true;
- $("status").textContent="Preparing your video...";
+ const mime=["video/webm;codecs=vp9","video/webm;codecs=vp8","video/webm"]
+  .find(type=>MediaRecorder.isTypeSupported(type));
 
- const stream=canvas.captureStream(30);
- let chunks=[];
+ if(!mime){
+  statusBox.textContent="This browser cannot export WebM video.";
+  return;
+ }
+
+ busy=true;
+ generateButton.disabled=true;
+ download.classList.add("hidden");
+ bar.style.width="0%";
+
  let recorder;
+ let music;
+ let tracks=[];
+ let chunks=[];
 
  try{
-  recorder=new MediaRecorder(stream,{mimeType});
+  statusBox.textContent="Preparing your cartoon story...";
+  music=createMusic();
+
+  const videoStream=canvas.captureStream(30);
+  const combined=new MediaStream([
+   ...videoStream.getVideoTracks(),
+   ...music.stream.getAudioTracks()
+  ]);
+  tracks=combined.getTracks();
+
+  recorder=new MediaRecorder(combined,{mimeType:mime});
   recorder.ondataavailable=e=>{
    if(e.data.size)chunks.push(e.data);
   };
 
-  recorder.onstop=()=>{
-   const blob=new Blob(chunks,{type:mimeType});
-   const url=URL.createObjectURL(blob);
-   const a=document.createElement("a");
-   a.href=url;
-   a.download="docunest-video.webm";
-   document.body.appendChild(a);
-   a.click();
-   a.remove();
-   setTimeout(()=>URL.revokeObjectURL(url),60000);
-   stream.getTracks().forEach(t=>t.stop());
-   recording=false;
-   $("export").disabled=false;
-   $("status").textContent="Video exported successfully! Check your Downloads folder.";
-  };
+  const finished=new Promise((resolve,reject)=>{
+   recorder.onstop=resolve;
+   recorder.onerror=()=>reject(new Error("Recording failed"));
+  });
 
-  recorder.start();
+  recorder.start(250);
 
-  const duration=Number($("duration").value)*1000;
-  const total=duration*scenes.length;
+  // Narration plays through the device speaker.
+  speak(scenes.join(" "));
+
+  const sceneDuration=5000;
+  const total=sceneDuration*scenes.length;
   const started=performance.now();
 
-  function render(now){
-   const elapsed=now-started;
-   if(elapsed>=total){
-    drawScene(scenes.length-1,1);
-    recorder.stop();
-    return;
-   }
-   const sceneIndex=Math.floor(elapsed/duration);
-   const progress=(elapsed%duration)/duration;
-   drawScene(sceneIndex,progress);
-   $("status").textContent=`Creating video: ${Math.floor(elapsed/total*100)}%`;
-   frame=requestAnimationFrame(render);
-  }
+  await new Promise(resolve=>{
+   function animate(now){
+    const elapsed=now-started;
+    const index=Math.min(Math.floor(elapsed/sceneDuration),scenes.length-1);
+    const sceneTime=(elapsed%sceneDuration)/1000;
 
-  frame=requestAnimationFrame(render);
+    drawScene(scenes[index],sceneTime,index,scenes.length);
+    const percent=Math.min(100,elapsed/total*100);
+    bar.style.width=percent+"%";
+    statusBox.textContent="Creating cartoon scene "+(index+1)+" of "+scenes.length+"...";
+
+    if(elapsed>=total){
+     drawScene(scenes[scenes.length-1],5,scenes.length-1,scenes.length);
+     resolve();
+    }else{
+     animationId=requestAnimationFrame(animate);
+    }
+   }
+   animationId=requestAnimationFrame(animate);
+  });
+
+  await wait(400);
+  recorder.stop();
+  await finished;
+
+  music.stop();
+  tracks.forEach(t=>t.stop());
+  window.speechSynthesis?.cancel();
+
+  const blob=new Blob(chunks,{type:mime});
+  const url=URL.createObjectURL(blob);
+
+  download.href=url;
+  download.download="docunest-cartoon-story.webm";
+  download.classList.remove("hidden");
+  bar.style.width="100%";
+  statusBox.textContent="Your cartoon video is ready! Tap Download Video to save it.";
 
  }catch(error){
-  if(recorder && recorder.state!=="inactive")recorder.stop();
-  stream.getTracks().forEach(t=>t.stop());
-  recording=false;
-  $("export").disabled=false;
-  $("status").textContent="Unable to export. Try another browser.";
+  if(animationId)cancelAnimationFrame(animationId);
+  if(recorder&&recorder.state!=="inactive"){
+   try{recorder.stop()}catch(e){}
+  }
+  if(music)music.stop();
+  tracks.forEach(t=>t.stop());
+  window.speechSynthesis?.cancel();
+  statusBox.textContent="Something went wrong. Please try again. "+error.message;
+ }finally{
+  busy=false;
+  generateButton.disabled=false;
  }
-};
+}
 
-$("textTab").onclick=()=>{
- $("textPanel").classList.remove("hidden");
- $("editPanel").classList.add("hidden");
- $("textTab").classList.add("active");
- $("editTab").classList.remove("active");
-};
+generateButton.addEventListener("click",createVideo);
 
-$("editTab").onclick=()=>{
- $("editPanel").classList.remove("hidden");
- $("textPanel").classList.add("hidden");
- $("editTab").classList.add("active");
- $("textTab").classList.remove("active");
-};
-
-$("videoFile").onchange=e=>{
- const file=e.target.files[0];
- if(!file)return;
- if(videoUrl)URL.revokeObjectURL(videoUrl);
- videoUrl=URL.createObjectURL(file);
- $("sourceVideo").src=videoUrl;
- $("sourceVideo").onloadedmetadata=()=>{
-  $("trimStart").value=0;
-  $("trimEnd").value=$("sourceVideo").duration.toFixed(1);
- };
- $("status").textContent="Video loaded successfully.";
-};
+drawScene("Your cartoon story starts here!",0,0,1);
 </script>
 </body>
 </html>
